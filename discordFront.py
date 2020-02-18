@@ -3,9 +3,10 @@ import os
 import json
 import requests
 
+import re
 import discord
 from dotenv import load_dotenv
-from gameInfoMain import getMatchInfo, getSummonerInfo, getSummonerID
+from gameInfoMain import getMatchInfo, getSummonerInfo, getSummonerID, getSummonerQueuerank
 
 # GetToken
 infoFile = open('infoFile.txt', 'r')
@@ -13,25 +14,8 @@ textFileContent = infoFile.read().split(',')
 token = textFileContent[0]
 print("Token: " + token)
 
-GUILD = "BotTestingGround"
-
 load_dotenv()
 client = discord.Client()
-
-
-@client.event
-async def on_ready():
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            break
-
-    print(
-        f'{client.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
-    )
-
-    members = '\n - '.join([member.name for member in guild.members])
-    print(f'Guild Members:\n - {members}')
 
 
 @client.event
@@ -46,8 +30,17 @@ async def on_message(message):
         if summonerInfo == "NO SUMMONER FOUND":  # TEST IF SUMMONER EXISTS
             await message.channel.send("Summoner does not exist!")
             return
+        soloQRank = getSummonerQueuerank(summonerName, "RANKED_SOLO_5x5")
+        flexQRank = getSummonerQueuerank(summonerName, "RANKED_FLEX_SR")
         returnText = "Summonername: {}\n" \
-                     "Level: {}".format(summonerInfo["name"], summonerInfo["summonerLevel"])
+                     "Level: {}\n" \
+                     "ID: {}\n".format(summonerInfo["name"], summonerInfo["summonerLevel"], summonerInfo["id"])
+        if not re.search("SUMMONER HAS NO RANK*", soloQRank):
+            returnText += ("SoloQ Rank: " + soloQRank+"\n")
+        if not re.search("SUMMONER HAS NO RANK*", flexQRank):
+            returnText += ("FlexQ Rank: " + flexQRank+"\n")
+
+
         await message.channel.send(returnText)
 
     if "ig:" in message.content.lower():
@@ -62,7 +55,11 @@ async def on_message(message):
             return
         returnText = getMatchReturnText(matchInfo)
         await message.channel.send(returnText)
+    if "test:" in message.content.lower():
+        summonerName = message.content.split("test:", 1)[1]
 
+       
+        await message.channel.send()
 
 def getMatchReturnText(matchInfo):
     summonerList = []
@@ -77,7 +74,7 @@ def getMatchReturnText(matchInfo):
         elif summoner == 6:
             returnText += "# TEAM 2 \n"
 
-        returnText += "Summonername: {} | Champion: {} | SP: {} and {}\n".format(
+        returnText += "Summonername: {} - Champion: {} - SP: {} and {}\n".format(
             summonerList[summoner - 1]["summonerName"], summonerList[summoner - 1]["championId"],
             summonerList[summoner - 1]["spell1Id"], summonerList[summoner - 1]["spell2Id"])
 
