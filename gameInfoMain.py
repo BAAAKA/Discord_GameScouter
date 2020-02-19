@@ -1,79 +1,105 @@
 import requests
+import re
 
-infoFile = open('infoFile.txt', 'r')
-textFileContent = infoFile.read().split(',')
-riotApiKey = textFileContent[1]
-print("riotApiKey: " + riotApiKey)
+summonerInfo = None
+queueTypeInfo = None
+matchInfo = None
 
-riotApiServerEUW = "https://euw1.api.riotgames.com/"
+from gameInfoRequests import *
 
 
-servers = {"BR": "https://br1.api.riotgames.com",
-           "EUN": "https://eun1.api.riotgames.com",
-           "EUW": "https://euw1.api.riotgames.com",
-           "JP": "https://jp1.api.riotgames.com",
-           "KR": "https://kr.api.riotgames.com",
-           "LA1": "https://la1.api.riotgames.com",
-           "LA2": "https://la2.api.riotgames.com",
-           "NA": "https://na1.api.riotgames.com",
-           "OC": "https://oc1.api.riotgames.com",
-           "TR": "https://tr1.api.riotgames.com",
-           "RU": "https://ru.api.riotgames.com"
-           }
+def getSummonerInfo(message):
+    print("NEW SUMMONER INFO REQUEST")
+    summonerName = message.content.split("su:", 1)[1]
+    summonerInfo = getSummonerApiInfo(summonerName)
+    if getSummonerExistance(summonerInfo):
+        returnText = "Summonername: {}\n" \
+                    "Level: {}\n" \
+                    "ID: {}\n".format(summonerInfo["name"], summonerInfo["summonerLevel"], summonerInfo["id"])
+        queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
+        if queueTypeInfo:
+            soloQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
+            soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
+            flexQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "tier")
+            flexQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "rank")
+            if not re.search("SUMMONER HAS NO RANK*", soloQRank):
+                returnText += ("SoloQ Rank: " + soloQTier + " " + soloQRank + "\n")
+            if not re.search("SUMMONER HAS NO RANK*", flexQRank):
+                returnText += ("FlexQ Rank: " + soloQTier + " " + flexQRank + "\n")
 
-def getSummonerInfo(summonerName):
-    requestUrl = "https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/"
-    completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerName, riotApiKey)
-    requestData = requests.get(completedRequestUrl).json()
-    try:
-        if requestData["status"]["status_code"] == 404:
-            requestData = "NO SUMMONER FOUND"
-    except:
-        pass
-    return requestData
+    else:
+        returnText = "Summoner does not exist!"
+    return returnText
+
+def getMatchInfo(message):
+    print("NEW MATCH INFO REQUEST")
+    summonerName = message.content.split("ig:", 1)[1]
+    summonerInfo = getSummonerApiInfo(summonerName)
+    if getSummonerExistance(summonerInfo):
+        matchInfo = getMatchApiInfo(summonerInfo["id"])
+        if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
+            returnText = "This summoner is not ingame right now..."
+        else:
+            print(matchInfo)
+            returnText = getMatchReturnText(matchInfo)
+    else:
+        returnText = "Summoner does not exist!"
+    return returnText
+
+
+
+##############
 
 
 def getSummonerID(summonerName):
     summonerID = (getSummonerInfo(summonerName))["id"]
     return summonerID
 
+def getSummonerExistance(summonerInfo):
+    if summonerInfo == "NO SUMMONER FOUND":
+        return False
+    else:
+        return True
 
-def getMatchInfo(summonerName):
-    summonerID = (getSummonerInfo(summonerName))["id"]
-    requestUrl = "https://euw1.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/"
-    completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
-    requestData = requests.get(completedRequestUrl).json()
-    try:
-        if requestData["status"]["status_code"] == 404:
-            requestData = "SUMMONER IS NOT INGAME"
-    except:
-        pass
-    return requestData
 
-def getSummonerRankedInfo(summonerName):
-    requestUrl = servers["EUW"]+"/lol/league/v4/entries/by-summoner/"
-    summonerID=getSummonerID(summonerName)
-    completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
-    requestData = requests.get(completedRequestUrl).json()
-    return requestData
-
-def getSummonerQueuerank(summonerName, queueType): #QueueTypes: RANKED_FLEX_SR, RANKED_SOLO_5x5
-    queueTypeInfo = getSummonerRankedInfo(summonerName)
-
-    RANKED_TIER = None
-    RANKED_RANK = None
-    if not queueTypeInfo:
-        print("SUMMONER HAS NO RANK!")
-        return "SUMMONER HAS NO RANK"
-    for qType in queueTypeInfo:
-        print(qType)
+def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
+    for qType in queueTypeInfo: #TEST IF SUMMONER HAS THIS QUEUETYPE RANK
         if qType["queueType"] == queueType:
-            RANKED_TIER = qType["tier"]
-            RANKED_RANK = qType["rank"]
-    if RANKED_TIER is None:
-        print("SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
-        return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
+            rankInfo = qType[whatInfo]
+            return rankInfo
+    print("SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
+    return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
 
-    return RANKED_TIER +" "+RANKED_RANK
+
+def getMatchReturnText(matchInfo):
+    summonerList = []
+
+    for nr in range(10):
+        summonerList.append(matchInfo["participants"][nr - 1])
+
+    returnText = "```"
+    returnText += "MODE: {} \n".format(matchInfo["gameMode"])
+    returnText += "ID: {} \n".format(matchInfo["gameId"])
+    returnText += "gameType: {} \n".format(matchInfo["gameType"])
+    returnText += "\n"
+    returnText += "# TEAM 1 \n"
+    for summoner in summonerList:
+        if summoner["teamId"] == 100:
+            returnText += "Summonername: {} - Champion: {} - SP: {} and {}\n".format(
+                summoner["summonerName"], summoner["championId"],
+                summoner["spell1Id"], summoner["spell2Id"])
+
+    returnText += "# TEAM 2 \n"
+    for summoner in summonerList:
+        if summoner["teamId"] == 200:
+            returnText += "Summonername: {} - Champion: {} - SP: {} and {}\n".format(
+                summoner["summonerName"], summoner["championId"],
+                summoner["spell1Id"], summoner["spell2Id"])
+
+
+    returnText += "```"
+
+    return returnText
+
 
 
