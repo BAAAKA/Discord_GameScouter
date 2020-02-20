@@ -28,7 +28,7 @@ async def on_message(message):
         returnText = getMatchInfo(message)
         await message.channel.send(returnText)
     if "test:" in message.content.lower():
-        await message.channel.send(embed=embedMessage)
+        await message.channel.send(embed="")
 
 
 
