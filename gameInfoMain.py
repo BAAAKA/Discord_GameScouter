@@ -1,5 +1,6 @@
-import requests
 import re
+import discord
+from urllib.parse import quote
 
 summonerInfo = None
 queueTypeInfo = None
@@ -7,15 +8,14 @@ matchInfo = None
 
 from gameInfoRequests import *
 
-
 def getSummonerInfo(message):
     print("NEW SUMMONER INFO REQUEST")
     summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
+    embedMessage = discord.Embed(title = summonerName,color=0x0099ff)
     if getSummonerExistance(summonerInfo):
-        returnText = "Summonername: {}\n" \
-                    "Level: {}\n" \
-                    "ID: {}\n".format(summonerInfo["name"], summonerInfo["summonerLevel"], summonerInfo["id"])
+        embedMessage.description = "Level: {}".format(summonerInfo["summonerLevel"])
+        embedMessage.set_thumbnail(url="http://avatar.leagueoflegends.com/"+quote("{}/{}.png".format("euw", summonerInfo["name"])))
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
@@ -23,13 +23,13 @@ def getSummonerInfo(message):
             flexQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "tier")
             flexQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "rank")
             if not re.search("SUMMONER HAS NO RANK*", soloQRank):
-                returnText += ("SoloQ Rank: " + soloQTier + " " + soloQRank + "\n")
-            if not re.search("SUMMONER HAS NO RANK*", flexQRank):
-                returnText += ("FlexQ Rank: " + soloQTier + " " + flexQRank + "\n")
+                embedMessage.add_field(name="SoloQ Rank: ", value=soloQTier + " " + soloQRank, inline=False)
 
+            if not re.search("SUMMONER HAS NO RANK*", flexQRank):
+                embedMessage.add_field(name="FlexQ Rank: ", value=flexQTier + " " + flexQRank, inline=False)
     else:
-        returnText = "Summoner does not exist!"
-    return returnText
+        embedMessage.description = "Summoner does not exist"
+    return embedMessage
 
 def getMatchInfo(message):
     print("NEW MATCH INFO REQUEST")
@@ -50,17 +50,11 @@ def getMatchInfo(message):
 
 ##############
 
-
-def getSummonerID(summonerName):
-    summonerID = (getSummonerInfo(summonerName))["id"]
-    return summonerID
-
 def getSummonerExistance(summonerInfo):
     if summonerInfo == "NO SUMMONER FOUND":
         return False
     else:
         return True
-
 
 def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
     for qType in queueTypeInfo: #TEST IF SUMMONER HAS THIS QUEUETYPE RANK

@@ -30,6 +30,7 @@ def getSummonerApiInfo(summonerName):
             requestData = "NO SUMMONER FOUND"
     except:
         pass
+    print("SUMMONERDATA: {}".format(requestData))
     return requestData
 
 
@@ -38,6 +39,7 @@ def getSummonerRankApiInfo(summonerID):
     requestUrl = servers["EUW"]+"/lol/league/v4/entries/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
     requestData = requests.get(completedRequestUrl).json()
+    print("RANKDATA: {}".format(requestData))
     return requestData
 
 
@@ -51,5 +53,6 @@ def getMatchApiInfo(summonerID):
             requestData = "SUMMONER IS NOT INGAME"
     except:
         pass
+    print("MATCHDATA: {}".format(requestData))
     return requestData
 
