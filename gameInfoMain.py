@@ -19,22 +19,20 @@ def getSummonerInfo(message):
         embedMessage.set_thumbnail(url="http://avatar.leagueoflegends.com/"+quote("{}/{}.png".format("euw", summonerInfo["name"])))
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
-            soloQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
-            flexQTier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "tier")
             flexQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "rank")
             if not re.search("SUMMONER HAS NO RANK*", soloQRank):
-                embedMessage.add_field(name="SoloQ Rank ", value=soloQTier + " " + soloQRank  + " - " + str(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "leaguePoints")) + " LP", inline=False)
+                embedMessage.add_field(name="SoloQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_SOLO_5x5"), inline=False)
                 embedMessage.add_field(name="wins ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins"), inline=True)
                 embedMessage.add_field(name="losses ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses"), inline=True)
-                embedMessage.add_field(name="winrate ", value=str(round(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins")/(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses")+getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins"))*100, 2))+"%", inline=True)
+                embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_SOLO_5x5")+"%", inline=True)
 
 
             if not re.search("SUMMONER HAS NO RANK*", flexQRank):
-                embedMessage.add_field(name="FlexQ Rank ", value=flexQTier + " " + flexQRank + " - " + str(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "leaguePoints")) + " LP", inline=False)
+                embedMessage.add_field(name="FlexQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_FLEX_SR"), inline=False)
                 embedMessage.add_field(name="wins ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "wins"), inline=True)
                 embedMessage.add_field(name="losses ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "losses"), inline=True)
-                embedMessage.add_field(name="winrate ", value=str(round(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "wins")/(getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "losses")+getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "wins"))*100, 2))+"%", inline=True)
+                embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_FLEX_SR")+"%", inline=True)
 
     else:
         embedMessage.description = "Summoner does not exist"
@@ -58,6 +56,20 @@ def getMatchInfo(message):
 
 
 ##############
+
+def getWinrate(queueTypeInfo, queueType):
+    totalWins = getSummonerRankInfoDetails(queueTypeInfo, queueType, "wins")
+    totalLosses = getSummonerRankInfoDetails(queueTypeInfo, queueType, "losses")
+    totalGames = totalWins+totalLosses
+    winrate = str(round(totalWins/totalGames*100))
+    return winrate
+
+def getRankAndLP(queueTypeInfo, queueType):
+    tier = getSummonerRankInfoDetails(queueTypeInfo, queueType, "tier")
+    rank = getSummonerRankInfoDetails(queueTypeInfo, queueType, "rank")
+    lp = str(getSummonerRankInfoDetails(queueTypeInfo, queueType, "leaguePoints"))
+    returnText = tier + " " + rank + " - " + lp + " LP"
+    return returnText
 
 def getSummonerExistance(summonerInfo):
     if summonerInfo == "NO SUMMONER FOUND":
