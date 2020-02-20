@@ -1,2 +1,2 @@
 # Discord_GameScouter
-Discord Bot, gets League of Legends match information
+Discord Bot, gets League of Legends summoner and match information.
