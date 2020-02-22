@@ -49,7 +49,7 @@ def getMatchApiInfo(summonerID):
             requestData = "SUMMONER IS NOT INGAME"
     except:
         pass
-    print("[INFO] MATCHDATA: {}".format(requestData))
+    #print("[INFO] MATCHDATA: {}".format(requestData))
     return requestData
 
 def getSummonerMasteryInfo(summonerID):

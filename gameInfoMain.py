@@ -3,12 +3,8 @@ import discord
 from urllib.parse import quote
 from gameInfoRequests import *
 
-summonerInfo = None
-queueTypeInfo = None
-matchInfo = None
-
 def getSummonerInfo(message):
-    print("NEW SUMMONER INFO REQUEST")
+    print("========================NEW SUMMONER INFO REQUEST========================")
     summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title = summonerName,color=0x0099ff)
@@ -52,15 +48,32 @@ def getSummonerInfo(message):
     return embedMessage
 
 def getMatchInfo(message):
-    print("NEW MATCH INFO REQUEST")
+    print("========================NEW MATCH INFO REQUEST========================")
     summonerName = message.content.split("ig:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
+
     if getSummonerExistance(summonerInfo):
         matchInfo = getMatchApiInfo(summonerInfo["id"])
         if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
             returnText = "This summoner is not ingame right now..."
         else:
-            print(matchInfo)
+            # here you know that the summoner exists and is ingame
+            for summoner in matchInfo["participants"]:
+                queueTypeInfo = getSummonerRankApiInfo(summoner["summonerId"])
+                if queueTypeInfo == None:
+                    print("UNRANKED")
+                    summonerRank="UNRANKED"
+                    summoner["Rank"]=summonerRank
+
+                else:
+                    Tier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
+                    Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
+                    summonerRank = Tier + " " + Rank
+                    print(summonerRank)
+                    summoner["Rank"]=summonerRank
+
+
+
             returnText = getMatchReturnText(matchInfo)
     else:
         returnText = "Summoner does not exist!"
@@ -111,7 +124,7 @@ def getChampionByID(championInfo, championID):
 
 
 def getSummonerIconURL(server, summonerName):
-    print("http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName)))
+    #print("http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName)))
     url="http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName))
     return url
 
@@ -140,7 +153,7 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
         if qType["queueType"] == queueType:
             rankInfo = qType[whatInfo]
             return rankInfo
-    print("SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
+    print("[INFO] SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
     return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
 
 def getSummonerMasteryInfoDetails(masteryInfo, placed):
@@ -167,16 +180,21 @@ def getMatchReturnText(matchInfo):
     returnText += "# TEAM 1 \n"
     for summoner in summonerList:
         if summoner["teamId"] == 100:
-            returnText += "Summonername: {} - Champion: {} - SP: {} and {}\n".format(
-                summoner["summonerName"], getChampionByID(championInfo, summoner["championId"]),
-                summoner["spell1Id"], summoner["spell2Id"])
+            returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
+                summoner["summonerName"],
+                getChampionByID(championInfo,summoner["championId"]),
+                summoner["Rank"]
+            )
+
 
     returnText += "# TEAM 2 \n"
     for summoner in summonerList:
         if summoner["teamId"] == 200:
-            returnText += "Summonername: {} - Champion: {} - SP: {} and {}\n".format(
-                summoner["summonerName"], getChampionByID(championInfo, summoner["championId"]),
-                summoner["spell1Id"], summoner["spell2Id"])
+            returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
+                summoner["summonerName"],
+                getChampionByID(championInfo,summoner["championId"]),
+                summoner["Rank"]
+            )
 
     returnText += "```"
     return returnText
