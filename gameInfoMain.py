@@ -34,8 +34,8 @@ def getSummonerInfo(message):
         MID2 = getSummonerMasteryInfoDetails(summonerInfo["id"], 2)
         MID3 = getSummonerMasteryInfoDetails(summonerInfo["id"], 3)
         embedMessage.add_field(name="Mastery", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
-        embedMessage.add_field(name="", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
-        embedMessage.add_field(name="", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+        embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
+        embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
 
     else:
         embedMessage.description = "Summoner does not exist"
