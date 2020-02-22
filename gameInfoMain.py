@@ -146,6 +146,12 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
 def getSummonerMasteryInfoDetails(masteryInfo, placed):
     return masteryInfo[placed-1]
 
+def getHelpText():
+    embedMessage = discord.Embed(title = "Help",color=0x0099ff)
+    embedMessage.add_field(name="Summoner Details", value="su: <Summonername> - lists summoner details", inline=False)
+    embedMessage.add_field(name="Match Details   ", value="ig: <Summonername> - lists game details", inline=False)
+    return embedMessage
+
 def getMatchReturnText(matchInfo):
     championInfo = getChampionInformation()
     summonerList = []

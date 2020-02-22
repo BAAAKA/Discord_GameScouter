@@ -1,7 +1,7 @@
 import discord
 from dotenv import load_dotenv
 import os
-from gameInfoMain import getSummonerInfo, getMatchInfo
+from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
 
 iboisChannelID=594973116019638515
 botTestingID=649304929613250560
@@ -34,6 +34,10 @@ async def on_message(message):
         if "ig:" in message.content.lower():
             returnText = getMatchInfo(message)
             await message.channel.send(returnText)
+
+        if "help:" in message.content.lower():
+            await message.channel.send(embed=getHelpText())
+
         if "test:" in message.content.lower():
             await message.channel.send(embed="")
 
