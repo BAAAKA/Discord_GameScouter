@@ -60,13 +60,12 @@ def getMatchInfo(message):
             # here you know that the summoner exists and is ingame
             for summoner in matchInfo["participants"]:
                 queueTypeInfo = getSummonerRankApiInfo(summoner["summonerId"])
-                if queueTypeInfo == None:
+                Tier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
+                if re.search("SUMMONER HAS NO RANK*", Tier):
                     print("UNRANKED")
-                    summonerRank="UNRANKED"
-                    summoner["Rank"]=summonerRank
-
+                    summonerRank = "UNRANKED"
+                    summoner["Rank"] = summonerRank
                 else:
-                    Tier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
                     Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
                     summonerRank = Tier + " " + Rank
                     print(summonerRank)
@@ -161,8 +160,8 @@ def getSummonerMasteryInfoDetails(masteryInfo, placed):
 
 def getHelpText():
     embedMessage = discord.Embed(title = "Help",color=0x0099ff)
-    embedMessage.add_field(name="Summoner Details", value="su: <Summonername> - lists summoner details", inline=False)
-    embedMessage.add_field(name="Match Details   ", value="ig: <Summonername> - lists game details", inline=False)
+    embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details", inline=False)
+    embedMessage.add_field(name="**ig: <Summonername>** ", value="Match Details - lists game details", inline=False)
     return embedMessage
 
 def getMatchReturnText(matchInfo):

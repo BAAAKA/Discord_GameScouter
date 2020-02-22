@@ -19,7 +19,7 @@ servers = {"BR": "https://br1.api.riotgames.com",
            }
 
 def getSummonerApiInfo(summonerName):
-    print("[INFO] getSummonerInfo RequestToAPI!")
+    print("[INFO] getSummonerInfo RequestToAPI! - " + summonerName)
     requestUrl = servers["EUW"] + "/lol/summoner/v4/summoners/by-name/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerName, riotApiKey)
     requestData = requests.get(completedRequestUrl).json()
@@ -32,7 +32,7 @@ def getSummonerApiInfo(summonerName):
     return requestData
 
 def getSummonerRankApiInfo(summonerID):
-    print("[INFO] getSummonerRankedInfo RequestToAPI!")
+    print("[INFO] getSummonerRankedInfo RequestToAPI - " + summonerID)
     requestUrl = servers["EUW"]+"/lol/league/v4/entries/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
     requestData = requests.get(completedRequestUrl).json()
@@ -40,7 +40,7 @@ def getSummonerRankApiInfo(summonerID):
     return requestData
 
 def getMatchApiInfo(summonerID):
-    print("[INFO] getMatchInfo RequestToAPI!")
+    print("[INFO] getMatchInfo RequestToAPI! - " + summonerID)
     requestUrl = servers["EUW"]+"/lol/spectator/v4/active-games/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
     requestData = requests.get(completedRequestUrl).json()
