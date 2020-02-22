@@ -57,7 +57,7 @@ def getSummonerMasteryInfo(summonerID):
     requestUrl = servers["EUW"] + "/lol/champion-mastery/v4/champion-masteries/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
     requestData = requests.get(completedRequestUrl).json()
-    print("[INFO] SUMMONERMASTERY: {}".format(requestData))
+    #print("[INFO] SUMMONERMASTERY: {}".format(requestData))
     return requestData
 
 def getChampionInformation():

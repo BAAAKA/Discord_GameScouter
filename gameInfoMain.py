@@ -13,29 +13,38 @@ def getSummonerInfo(message):
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title = summonerName,color=0x0099ff)
     if getSummonerExistance(summonerInfo):
-        embedMessage.description = "Level: {}".format(summonerInfo["summonerLevel"])
+        embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
         embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"]))
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
             flexQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "rank")
             if not re.search("SUMMONER HAS NO RANK*", soloQRank):
-                embedMessage.add_field(name="SoloQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_SOLO_5x5"), inline=False)
+                embedMessage.add_field(name=":beginner: SoloQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_SOLO_5x5"), inline=False)
                 embedMessage.add_field(name="wins ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins"), inline=True)
                 embedMessage.add_field(name="losses ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses"), inline=True)
                 embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_SOLO_5x5")+"%", inline=True)
             if not re.search("SUMMONER HAS NO RANK*", flexQRank):
-                embedMessage.add_field(name="FlexQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_FLEX_SR"), inline=False)
+                embedMessage.add_field(name=":beginner: FlexQ Rank ", value=getRankAndLP(queueTypeInfo, "RANKED_FLEX_SR"), inline=False)
                 embedMessage.add_field(name="wins ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "wins"), inline=True)
                 embedMessage.add_field(name="losses ", value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "losses"), inline=True)
                 embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_FLEX_SR")+"%", inline=True)
+
+        masteryInfo = getSummonerMasteryInfo(summonerInfo["id"])
+
         #MASTERINFODETAILS
-        MID1 = getSummonerMasteryInfoDetails(summonerInfo["id"], 1)
-        MID2 = getSummonerMasteryInfoDetails(summonerInfo["id"], 2)
-        MID3 = getSummonerMasteryInfoDetails(summonerInfo["id"], 3)
-        embedMessage.add_field(name="Mastery", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
+        MID1 = getSummonerMasteryInfoDetails(masteryInfo, 1)
+        MID2 = getSummonerMasteryInfoDetails(masteryInfo, 2)
+        MID3 = getSummonerMasteryInfoDetails(masteryInfo, 3)
+
+
+        embedMessage.add_field(name="Masteries", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+
+        mostPlayedChamp=getChampionByID(getChampionInformation(),getSummonerMasteryInfoDetails(masteryInfo, 1)["championId"])
+        embedMessage.set_image(url=getSplashURL(mostPlayedChamp))
+
 
     else:
         embedMessage.description = "Summoner does not exist"
@@ -58,6 +67,11 @@ def getMatchInfo(message):
     return returnText
 
 ##############
+
+def getSplashURL(champion):
+    url="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
+    return url
+
 
 def getFooterText(type):
     text = 'gameScouter V0.5 - Commit 9'
@@ -86,7 +100,7 @@ def getMasteryPoints(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetail
     mostPlayedChampPTS1=str(MasteryInfoDetails1["championPoints"])
     mostPlayedChampPTS2=str(MasteryInfoDetails2["championPoints"])
     mostPlayedChampPTS3=str(MasteryInfoDetails3["championPoints"])
-    return "pts: "+mostPlayedChampPTS1+"\npts: "+mostPlayedChampPTS2+"\npts: "+mostPlayedChampPTS3
+    return "pts "+mostPlayedChampPTS1+"\npts "+mostPlayedChampPTS2+"\npts "+mostPlayedChampPTS3
 
 def getChampionByID(championInfo, championID):
     for championNames in championInfo["data"]:
@@ -129,8 +143,7 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
     print("SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
     return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
 
-def getSummonerMasteryInfoDetails(summonerID, placed):
-    masteryInfo = getSummonerMasteryInfo(summonerID)
+def getSummonerMasteryInfoDetails(masteryInfo, placed):
     return masteryInfo[placed-1]
 
 def getMatchReturnText(matchInfo):
