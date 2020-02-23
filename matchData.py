@@ -1,12 +1,22 @@
 from PIL import Image
+from pathlib import Path
+import os
 
-imageFolder="data\img\champion\loading"
-imageRankFolder=r"data\ranked-emblems"
-imageTitlesFolder=r"data\img\champion\tiles"
-imageArenaPath=r"data\img\global\arena.png"
-imageArenaPath2=r"data\img\global\arena2.png"
-imageArenaBigPath=r"data\img\global\arenaBig.jpg"
-fontPath=r"D:\Programme\pyCharm\jbr\lib\fonts\SourceCodePro-Bold.ttf"
+imageFolder = "data/img/champion/loading"
+imageRankFolder = r"data/ranked-emblems"
+imageTitlesFolder = r"data/img/champion/tiles"
+imageArenaPath = Path(r"data/img/global/arena.png")
+imageArenaPath2 = Path(r"data/img/global/arena2.png")
+imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
+
+
+if os.name == "nt":
+    print("WINDOWS FONT")
+    fontPath = r"D:\Programme\pyCharm\jbr\lib\fonts\SourceCodePro-Bold.ttf"
+else:
+    print("LINUX FONT")
+    fontPath = r"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+
 
 def getFont():
     return fontPath
@@ -21,15 +31,15 @@ def getArenaBig():
     return Image.open(imageArenaBigPath)
 
 def getLocalLoadingImage(champion):
-    path=imageFolder + "\{}_0.jpg".format(champion)
+    path = Path(imageFolder + "/{}_0.jpg".format(champion))
     return path
 
 def getLocalTitlesImage(champion):
-    path=imageTitlesFolder + "\{}_0.jpg".format(champion)
+    path = Path(imageTitlesFolder + "/{}_0.jpg".format(champion))
     return path
 
 def getLocalRankedImage(rank):
-    path=imageRankFolder + "\Emblem_{}.png".format(rank)
+    path = Path(imageRankFolder + "/Emblem_{}.png".format(rank))
     return path
 
 def getSplashURL(champion):

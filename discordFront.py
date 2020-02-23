@@ -2,6 +2,7 @@ import discord
 from dotenv import load_dotenv
 import os
 import re
+from pathlib import Path
 from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
 
 iboisChannelID=594973116019638515
@@ -35,7 +36,7 @@ async def on_message(message):
         if "ig:" in message.content.lower():
             returnText = getMatchInfo(message)
             if re.search("temp*", returnText):
-                await message.channel.send(file=discord.File(returnText))
+                await message.channel.send(file=discord.File(Path(returnText)))
             else:
                 await message.channel.send(returnText)
 

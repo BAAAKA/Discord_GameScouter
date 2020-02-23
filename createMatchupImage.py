@@ -1,6 +1,8 @@
 import sys
 from PIL import Image, ImageDraw, ImageFont
 from matchData import *
+from pathlib import Path
+
 import time
 def getMatchImage(matchInfo):
     print("[INFO] getMatchImage!")
@@ -21,7 +23,8 @@ def getMatchImage(matchInfo):
 
     for summoner in summoners:
         summoners[summoner]["championImage"] = Image.open(getLocalTitlesImage(summoners[summoner]["champion"]))
-        summoners[summoner]["tierImage"] = Image.open(getLocalRankedImage(summoners[summoner]["tier"]))
+        tier=summoners[summoner]["tier"].lower().capitalize()
+        summoners[summoner]["tierImage"] = Image.open(getLocalRankedImage(tier))
 
     for summonerNr in summoners:
         x = startPositions[summonerNr][0]
