@@ -2,12 +2,14 @@ import re
 import discord
 from urllib.parse import quote
 from gameInfoRequests import *
+from createMatchupImage import getMatchImage
 
 def getSummonerInfo(message):
     print("========================NEW SUMMONER INFO REQUEST========================")
     summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title = summonerName,color=0x0099ff)
+
     if getSummonerExistance(summonerInfo):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
         embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"]))
@@ -58,21 +60,26 @@ def getMatchInfo(message):
             returnText = "This summoner is not ingame right now..."
         else:
             # here you know that the summoner exists and is ingame
+            championInfo = getChampionInformation()
+
             for summoner in matchInfo["participants"]:
+                #Champion
+                summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
+                #rank
                 queueTypeInfo = getSummonerRankApiInfo(summoner["summonerId"])
                 Tier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
                 if re.search("SUMMONER HAS NO RANK*", Tier):
-                    print("UNRANKED")
-                    summonerRank = "UNRANKED"
-                    summoner["Rank"] = summonerRank
+                    summonerRank = "Unranked"
+                    summoner["tier"] = summonerRank
+                    summoner["RankTier"] = summonerRank
                 else:
                     Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
                     summonerRank = Tier + " " + Rank
                     print(summonerRank)
-                    summoner["Rank"]=summonerRank
+                    summoner["tier"] = Tier
+                    summoner["RankTier"] = summonerRank
 
-
-
+            getMatchImage(matchInfo)
             returnText = getMatchReturnText(matchInfo)
     else:
         returnText = "Summoner does not exist!"
@@ -86,7 +93,7 @@ def getSplashURL(champion):
 
 
 def getFooterText(type):
-    text = 'gameScouter V0.5 - Commit 9'
+    text = 'gameScouter V1.0 - Commit 15'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
@@ -165,11 +172,10 @@ def getHelpText():
     return embedMessage
 
 def getMatchReturnText(matchInfo):
-    championInfo = getChampionInformation()
-    summonerList = []
+    summoners = []
 
     for nr in range(10):
-        summonerList.append(matchInfo["participants"][nr - 1])
+        summoners.append(matchInfo["participants"][nr - 1])
 
     returnText = "```"
     returnText += "MODE: {} \n".format(matchInfo["gameMode"])
@@ -177,22 +183,22 @@ def getMatchReturnText(matchInfo):
     returnText += "gameType: {} \n".format(matchInfo["gameType"])
     returnText += "\n"
     returnText += "# TEAM 1 \n"
-    for summoner in summonerList:
+    for summoner in summoners:
         if summoner["teamId"] == 100:
             returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
                 summoner["summonerName"],
-                getChampionByID(championInfo,summoner["championId"]),
-                summoner["Rank"]
+                summoner["champion"],
+                summoner["RankTier"]
             )
 
 
     returnText += "# TEAM 2 \n"
-    for summoner in summonerList:
+    for summoner in summoners:
         if summoner["teamId"] == 200:
             returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
                 summoner["summonerName"],
-                getChampionByID(championInfo,summoner["championId"]),
-                summoner["Rank"]
+                summoner["champion"],
+                summoner["RankTier"]
             )
 
     returnText += "```"
