@@ -1,6 +1,7 @@
 import discord
 from dotenv import load_dotenv
 import os
+import re
 from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
 
 iboisChannelID=594973116019638515
@@ -33,7 +34,10 @@ async def on_message(message):
 
         if "ig:" in message.content.lower():
             returnText = getMatchInfo(message)
-            await message.channel.send(returnText)
+            if re.search("temp*", returnText):
+                await message.channel.send(file=discord.File(returnText))
+            else:
+                await message.channel.send(returnText)
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())

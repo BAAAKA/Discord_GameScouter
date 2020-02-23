@@ -75,12 +75,11 @@ def getMatchInfo(message):
                 else:
                     Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
                     summonerRank = Tier + " " + Rank
-                    print(summonerRank)
                     summoner["tier"] = Tier
                     summoner["RankTier"] = summonerRank
 
-            getMatchImage(matchInfo)
-            returnText = getMatchReturnText(matchInfo)
+            filePath=getMatchImage(matchInfo)
+            returnText = filePath
     else:
         returnText = "Summoner does not exist!"
     return returnText
@@ -93,7 +92,7 @@ def getSplashURL(champion):
 
 
 def getFooterText(type):
-    text = 'gameScouter V1.0 - Commit 15'
+    text = 'gameScouter V2.0 - Commit 20'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text

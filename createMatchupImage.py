@@ -1,7 +1,7 @@
 import sys
 from PIL import Image, ImageDraw, ImageFont
 from matchData import *
-
+import time
 def getMatchImage(matchInfo):
     imageArena = getArenaBig()
     #summoners = getSummoners()
@@ -31,6 +31,8 @@ def getMatchImage(matchInfo):
         imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x, y+200), mask=summoners[summonerNr]["tierImage"])
         d.text((x, y-55),summoners[summonerNr]["summonerName"] , font=fnt, fill=(255, 255, 255))
 
-    imageArena.show()
-    print("END")
+    filename = time.strftime("MATCH%Y%m%d-%H%M%S.png")
+    filePath = "temp/{}".format(filename)
+    imageArena.save(filePath)
+    return filePath
 
