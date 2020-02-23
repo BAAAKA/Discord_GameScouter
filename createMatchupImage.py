@@ -12,7 +12,8 @@ def getMatchImage(matchInfo):
 
     startPositions = getStartPositions()
     fnt = ImageFont.truetype(getFont(), 50)
-    fntSmall = ImageFont.truetype(getFont(), 42)
+    fnt42 = ImageFont.truetype(getFont(), 42)
+    fnt35 = ImageFont.truetype(getFont(), 35)
     d = ImageDraw.Draw(imageArena)
 
     x=1
@@ -32,12 +33,14 @@ def getMatchImage(matchInfo):
         x = startPositions[summonerNr][0]
         y = startPositions[summonerNr][1]
         imageArena.paste(summoners[summonerNr]["championImage"], getAreaOfTitles(x, y))
-        imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x, y+200), mask=summoners[summonerNr]["tierImage"])
-
+        imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x+20, y+200), mask=summoners[summonerNr]["tierImage"])
         if len(summoners[summonerNr]["summonerName"]) < 12:
             d.text((x, y-70),summoners[summonerNr]["summonerName"] , font=fnt, fill=(255, 255, 255))
         else:
-            d.text((x, y-60),summoners[summonerNr]["summonerName"] , font=fntSmall, fill=(255, 255, 255))
+            d.text((x, y-60),summoners[summonerNr]["summonerName"] , font=fnt42, fill=(255, 255, 255))
+
+        d.text((x, y + 480), summoners[summonerNr]["RankTier"], font=fnt35, fill=(255, 255, 255))
+
 
     filename = time.strftime("MATCH%Y%m%d-%H%M%S.png")
     filePath = "temp/{}".format(filename)
