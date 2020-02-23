@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 from matchData import *
 import time
 def getMatchImage(matchInfo):
+    print("[INFO] getMatchImage!")
     imageArena = getArenaBig()
     #summoners = getSummoners()
     summoners = {}
@@ -13,14 +14,12 @@ def getMatchImage(matchInfo):
 
     x=1
     for summonerNr in matchInfo["participants"]:
-        print(summonerNr)
-        print(summonerNr["summonerName"])
         summoners[str(x)] = summonerNr
+        print("[INFO] SUMMONERS: {}".format(summoners[str(x)]["summonerName"]))
         x=x+1
 
 
     for summoner in summoners:
-        print(summoners[summoner]["champion"])
         summoners[summoner]["championImage"] = Image.open(getLocalTitlesImage(summoners[summoner]["champion"]))
         summoners[summoner]["tierImage"] = Image.open(getLocalRankedImage(summoners[summoner]["tier"]))
 
@@ -34,5 +33,6 @@ def getMatchImage(matchInfo):
     filename = time.strftime("MATCH%Y%m%d-%H%M%S.png")
     filePath = "temp/{}".format(filename)
     imageArena.save(filePath)
+    print("[INFO] Done with match Image!")
     return filePath
 
