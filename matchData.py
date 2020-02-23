@@ -8,6 +8,7 @@ imageTitlesFolder = r"data/img/champion/tiles"
 imageArenaPath = Path(r"data/img/global/arena.png")
 imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
+imageArenaCleanPath = Path(r"data/img/global/arenaClean.png")
 
 
 if os.name == "nt":
@@ -23,6 +24,10 @@ def getFont():
 
 def getArena():
     return Image.open(imageArenaPath)
+
+
+def getArenaClean():
+    return Image.open(imageArenaCleanPath)
 
 def getArena2():
     return Image.open(imageArenaPath2)
