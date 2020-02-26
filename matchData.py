@@ -69,8 +69,10 @@ def getNameById(id):
 def getMapById(id):
     if(id == 11):
         return "Summoners Rift"
+    elif(id == 12):
+        return "Howling Abyss"
     else:
-        return "IDK probably ARAM: "+str(id)
+        return "idk this map, what is it, take this id: "+str(id)
 
 def getSplashURL(champion):
     url="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
@@ -79,6 +81,13 @@ def getSplashURL(champion):
 def getLoadingURL(champion):
     url="https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{}_0.jpg".format(champion)
     return url
+
+def getChampionByID(championInfo, championID):
+    for championNames in championInfo["data"]:
+        if str(championID) == championInfo["data"][championNames]["key"]:
+            return championNames
+    print("[ERROR] Unknown Champion ID: {}".format(championID))
+    return "No Champion with ID: {}".format(championID)
 
 def getAreaOfSplash(width,height):
     imageHeight=560
@@ -108,6 +117,12 @@ def getAreaOfSpells(width,height):
     y2=height+imageHeight
     return width,height,x2,y2
 
+def getAreaOfCustom(width,height, size):
+    imageHeight=size
+    imageWidth=size
+    x2=width+imageWidth
+    y2=height+imageHeight
+    return width,height,x2,y2
 
 summoner1 = {}
 summoner2 = {}

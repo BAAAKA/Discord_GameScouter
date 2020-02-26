@@ -1,6 +1,8 @@
 import sys
 from PIL import Image, ImageDraw, ImageFont
 from matchData import *
+from gameInfoRequests import getChampionInformation
+
 from pathlib import Path
 
 import time
@@ -22,15 +24,13 @@ def getMatchImage(matchInfo):
         print("[INFO] SUMMONERS: {}".format(summoners[str(x)]["summonerName"]))
         x=x+1
 
-    #Get Summoner Tier
+    #Get Summoner Tier and Spells and champ images
     for summoner in summoners:
         summoners[summoner]["championImage"] = Image.open(getLocalTitlesImage(summoners[summoner]["champion"]))
         tier=summoners[summoner]["tier"].lower().capitalize()
         summoners[summoner]["tierImage"] = Image.open(getLocalRankedImage(tier))
         name1 = getNameById(summoners[summoner]["spell1Id"])
         name2 = getNameById(summoners[summoner]["spell2Id"])
-
-
         summoners[summoner]["spell1Image"] = Image.open(getLocalSummonersImage(name1))
         summoners[summoner]["spell2Image"] = Image.open(getLocalSummonersImage(name2))
 
@@ -49,12 +49,34 @@ def getMatchImage(matchInfo):
         imageArena.paste(summoners[summonerNr]["spell1Image"], getAreaOfSpells(x, y + 400))
         imageArena.paste(summoners[summonerNr]["spell2Image"], getAreaOfSpells(x+64, y + 400))
 
+
+    #MIDDLEPART
     middleImageX = 100
-    middleImageY = 1000
+    middleImageY = 920
 
     d.text((middleImageX, middleImageY), "Gamemode: "+matchInfo["gameMode"], font=fnt35, fill=(255, 255, 255))
     d.text((middleImageX+600, middleImageY), "Map: "+getMapById(matchInfo["mapId"]), font=fnt35, fill=(255, 255, 255))
+    d.text((middleImageX+1540, middleImageY), "Bans: ", font=fnt35, fill=(255, 255, 255))
 
+    # BANNED CHAMPIONS
+    print(matchInfo["bannedChampions"])
+    championInfo = getChampionInformation()
+    imageSize = 80
+    turns = 1
+    row = 0
+    for banned in matchInfo["bannedChampions"]:
+        champion = getChampionByID(championInfo, banned["championId"])
+        image = Image.open(getLocalTitlesImage(champion))
+        print(champion)
+        imageEdited = image.resize((imageSize,imageSize))
+        imageArena.paste(imageEdited, getAreaOfCustom(middleImageX+((imageSize+6)*turns)+1600, middleImageY+row, imageSize))
+        turns += 1
+        if turns == 6:
+            turns = 1
+            row = 130
+
+
+    #END
     filename = time.strftime("MATCH%Y%m%d-%H%M%S.png")
     filePath = "temp/{}".format(filename)
     imageArena.save(filePath)
