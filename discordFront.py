@@ -35,10 +35,12 @@ async def on_message(message):
 
         if "ig:" in message.content.lower():
             returnText = getMatchInfo(message)
-            if re.search("temp*", returnText):
-                await message.channel.send(file=discord.File(Path(returnText)))
-            else:
+            if isinstance(returnText, str):
                 await message.channel.send(returnText)
+                return
+
+            image = discord.File(returnText[1], filename="matchImage.png")
+            await message.channel.send(file=image, embed=returnText[0])
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())

@@ -67,7 +67,6 @@ def getMatchImage(matchInfo):
     for banned in matchInfo["bannedChampions"]:
         champion = getChampionByID(championInfo, banned["championId"])
         image = Image.open(getLocalTitlesImage(champion))
-        print(champion)
         imageEdited = image.resize((imageSize,imageSize))
         imageArena.paste(imageEdited, getAreaOfCustom(middleImageX+((imageSize+6)*turns)+1600, middleImageY+row, imageSize))
         turns += 1

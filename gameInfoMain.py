@@ -46,6 +46,7 @@ def getSummonerInfo(message):
 
     else:
         embedMessage.description = "Summoner does not exist"
+
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
     return embedMessage
 
@@ -79,7 +80,10 @@ def getMatchInfo(message):
                     summoner["RankTier"] = summonerRank
 
             filePath=getMatchImage(matchInfo)
-            returnText = filePath
+            embedMessage = discord.Embed(color=0x0099ff)
+            embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
+            embedMessage.set_image(url="attachment://matchImage.png")
+            returnText = embedMessage, filePath
     else:
         returnText = "Summoner does not exist!"
     return returnText
@@ -92,7 +96,7 @@ def getSplashURL(champion):
 
 
 def getFooterText(type):
-    text = 'gameScouter V1.8 - Commit 17'
+    text = 'gameScouter V2.1 - Commit 27'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
