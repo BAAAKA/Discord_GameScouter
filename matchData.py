@@ -2,14 +2,27 @@ from PIL import Image
 from pathlib import Path
 import os
 
-imageFolder = "data/img/champion/loading"
+imageChampionFolder = "data/img/champion/loading"
 imageRankFolder = r"data/ranked-emblems"
 imageTitlesFolder = r"data/img/champion/tiles"
+imageSummonersFolder = r"data/summonerSpells"
 imageArenaPath = Path(r"data/img/global/arena.png")
 imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
 imageArenaCleanPath = Path(r"data/img/global/arenaClean.png")
 
+summonerSpells = {}
+summonerSpells[1] = "Cleanse"
+summonerSpells[3] = "Exhaust"
+summonerSpells[4] = "Flash"
+summonerSpells[6] = "Ghost"
+summonerSpells[7] = "Heal"
+summonerSpells[11] = "Smite"
+summonerSpells[12] = "Teleport"
+summonerSpells[13] = "Clarity"
+summonerSpells[14] = "Ignite"
+summonerSpells[21] = "Barrier"
+summonerSpells[32] = "Mark"
 
 if os.name == "nt":
     print("WINDOWS FONT")
@@ -25,7 +38,6 @@ def getFont():
 def getArena():
     return Image.open(imageArenaPath)
 
-
 def getArenaClean():
     return Image.open(imageArenaCleanPath)
 
@@ -36,7 +48,7 @@ def getArenaBig():
     return Image.open(imageArenaBigPath)
 
 def getLocalLoadingImage(champion):
-    path = Path(imageFolder + "/{}_0.jpg".format(champion))
+    path = Path(imageChampionFolder + "/{}_0.jpg".format(champion))
     return path
 
 def getLocalTitlesImage(champion):
@@ -46,6 +58,19 @@ def getLocalTitlesImage(champion):
 def getLocalRankedImage(rank):
     path = Path(imageRankFolder + "/Emblem_{}.png".format(rank))
     return path
+
+def getLocalSummonersImage(summoners):
+    path = Path(imageSummonersFolder + "/{}.png".format(summoners))
+    return path
+
+def getNameById(id):
+    return summonerSpells[id]
+
+def getMapById(id):
+    if(id == 11):
+        return "Summoners Rift"
+    else:
+        return "IDK probably ARAM: "+str(id)
 
 def getSplashURL(champion):
     url="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
@@ -75,6 +100,14 @@ def getAreaOfTitles(width,height):
     x2=width+imageWidth
     y2=height+imageHeight
     return width,height,x2,y2
+
+def getAreaOfSpells(width,height):
+    imageHeight=64
+    imageWidth=64
+    x2=width+imageWidth
+    y2=height+imageHeight
+    return width,height,x2,y2
+
 
 summoner1 = {}
 summoner2 = {}
@@ -157,18 +190,19 @@ for summoner in summoners:
 def getSummoners():
     return summoners
 
-
+yStartTeam1 = 100
+yStartTeam2 = 1245
 startPositions = {}
-startPositions["1"] = (0, 100)
-startPositions["2"] = (500, 100)
-startPositions["3"] = (1000, 100)
-startPositions["4"] = (1500, 100)
-startPositions["5"] = (2000, 100)
-startPositions["6"] = (0, 1000)
-startPositions["7"] = (500, 1000)
-startPositions["8"] = (1000, 1000)
-startPositions["9"] = (1500, 1000)
-startPositions["10"] = (2000, 1000)
+startPositions["1"] = (0, yStartTeam1)
+startPositions["2"] = (500, yStartTeam1)
+startPositions["3"] = (1000, yStartTeam1)
+startPositions["4"] = (1500, yStartTeam1)
+startPositions["5"] = (2000, yStartTeam1)
+startPositions["6"] = (0, yStartTeam2)
+startPositions["7"] = (500, yStartTeam2)
+startPositions["8"] = (1000, yStartTeam2)
+startPositions["9"] = (1500, yStartTeam2)
+startPositions["10"] = (2000, yStartTeam2)
 
 def getStartPositions():
     return startPositions

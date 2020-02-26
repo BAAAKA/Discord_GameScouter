@@ -22,6 +22,7 @@ def getSummonerApiInfo(summonerName):
     print("[INFO] getSummonerInfo RequestToAPI! - " + summonerName)
     requestUrl = servers["EUW"] + "/lol/summoner/v4/summoners/by-name/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerName, riotApiKey)
+    print("[INFO] REQUESTURL SUMMONER: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     try:
         if requestData["status"]["status_code"] == 404:
@@ -35,6 +36,7 @@ def getSummonerRankApiInfo(summonerID):
     print("[INFO] getSummonerRankedInfo RequestToAPI - " + summonerID)
     requestUrl = servers["EUW"]+"/lol/league/v4/entries/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
+    print("[INFO] REQUESTURL RANK: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     print("[INFO] RANKDATA: {}".format(requestData))
     return requestData
@@ -43,6 +45,7 @@ def getMatchApiInfo(summonerID):
     print("[INFO] getMatchInfo RequestToAPI! - " + summonerID)
     requestUrl = servers["EUW"]+"/lol/spectator/v4/active-games/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
+    print("[INFO] REQUESTURL MATCH: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     try:
         if requestData["status"]["status_code"] == 404:
