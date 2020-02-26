@@ -96,7 +96,7 @@ def getSplashURL(champion):
 
 
 def getFooterText(type):
-    text = 'gameScouter V2.1 - Commit 27'
+    text = 'gameScouter V2.1 - Commit 24'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text

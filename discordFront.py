@@ -5,12 +5,15 @@ import re
 from pathlib import Path
 from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
 
-iboisChannelID=594973116019638515
-botTestingID=649304929613250560
+iboisChannelID = 594973116019638515
+botTestingID = 649304929613250560
+myServerID = 682327435370430567
+channelID = []
 if os.name == "nt":
-    channelID=botTestingID
+    channelID.append(botTestingID)
 else:
-    channelID=iboisChannelID
+    channelID.append(iboisChannelID)
+    channelID.append(myServerID)
 
 # GetToken
 token = os.environ['discordToken']
@@ -21,7 +24,7 @@ client = discord.Client()
 
 @client.event
 async def on_message(message):
-    if message.channel.id == channelID:
+    if message.channel.id in channelID:
         if message.author == client.user:
             return
         if "lol" == message.content.lower():
