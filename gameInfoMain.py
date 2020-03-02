@@ -78,6 +78,11 @@ def getMatchInfo(message):
                     summonerRank = Tier + " " + Rank
                     summoner["tier"] = Tier
                     summoner["RankTier"] = summonerRank
+                #MatchList
+                print("###MATCHLISTINFO TEST")
+                #matchListInfo = getMatchListApiInfo(summoner["summonerId"])
+                #for match in matchListInfo:
+                #    print(match["lane"])
 
             filePath=getMatchImage(matchInfo)
             embedMessage = discord.Embed(color=0x0099ff)

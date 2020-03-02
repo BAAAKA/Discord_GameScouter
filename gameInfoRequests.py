@@ -41,6 +41,15 @@ def getSummonerRankApiInfo(summonerID):
     print("[INFO] RANKDATA: {}".format(requestData))
     return requestData
 
+def getMatchListApiInfo(accountId):
+    print("[INFO] getMatchListApiInfo RequestToAPI - " + accountId)
+    requestUrl = servers["EUW"]+"/lol/match/v4/matchlists/by-account/"
+    completedRequestUrl = "{}{}?api_key={}".format(requestUrl, accountId, riotApiKey)
+    print("[INFO] REQUESTURL MatchList: " + completedRequestUrl)
+    requestData = requests.get(completedRequestUrl).json()
+    print("[INFO] MatchList: {}".format(requestData))
+    return requestData
+
 def getMatchApiInfo(summonerID):
     print("[INFO] getMatchInfo RequestToAPI! - " + summonerID)
     requestUrl = servers["EUW"]+"/lol/spectator/v4/active-games/by-summoner/"

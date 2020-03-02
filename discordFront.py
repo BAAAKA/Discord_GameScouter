@@ -37,13 +37,17 @@ async def on_message(message):
             await message.channel.send(embed=returnText)
 
         if "ig:" in message.content.lower():
+            loadingMessage = await message.channel.send("processing your request...")
+            loadingMessageFetched = await message.channel.fetch_message(loadingMessage.id)
             returnText = getMatchInfo(message)
             if isinstance(returnText, str):
                 await message.channel.send(returnText)
+                await loadingMessageFetched.delete()
                 return
-
             image = discord.File(returnText[1], filename="matchImage.png")
             await message.channel.send(file=image, embed=returnText[0])
+            await loadingMessageFetched.delete()
+
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())
