@@ -6,6 +6,7 @@ imageChampionFolder = "data/img/champion/loading"
 imageRankFolder = r"data/ranked-emblems"
 imageTitlesFolder = r"data/img/champion/tiles"
 imageSummonersFolder = r"data/summonerSpells"
+imagePerkFolder = r"data/perks"
 imageArenaPath = Path(r"data/img/global/arena.png")
 imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
@@ -23,6 +24,29 @@ summonerSpells[13] = "Clarity"
 summonerSpells[14] = "Ignite"
 summonerSpells[21] = "Barrier"
 summonerSpells[32] = "Mark"
+
+perks = {}
+perks[8005] = "Precision","PressTheAttack"
+perks[8008] = "Precision","LethalTempoTemp"
+perks[8010] = "Precision","Conqueror"
+perks[8021] = "Precision","FleetFootwork"
+
+perks[8112] = "Domination","Electrocute"
+perks[8128] = "Domination","DarkHarvest"
+perks[8010] = "Domination","DarkHarvest"
+
+perks[8214] = "Sorcery","SummonAery"
+perks[8229] = "Sorcery","ArcaneComet"
+perks[8230] = "Sorcery","PhaseRush"
+
+perks[8351] = "Inspiration","GlacialAugment"
+perks[83] = "Inspiration","GlacialAugment"
+perks[83] = "Inspiration","GlacialAugment"
+
+perks[8437] = "Resolve","GraspOfTheUndying"
+perks[8439] = "Resolve","VeteranAftershock"
+perks[84] = "Resolve","VeteranAftershock"
+
 
 if os.name == "nt":
     print("WINDOWS FONT")
@@ -63,6 +87,18 @@ def getLocalSummonersImage(summoners):
     path = Path(imageSummonersFolder + "/{}.png".format(summoners))
     return path
 
+def getLocalPerkImage(perkId):
+    try:
+        perks[perkId]
+    except:
+        print("UNKNOWN perkId: {}".format(perkId))
+        path = Path(imagePerkFolder + "/{}/{}.png".format("unknown", "unknown"))
+        return path
+    tree, perk = perks[perkId]
+    path = Path(imagePerkFolder + "/{}/{}.png".format(tree, perk))
+    return path
+
+
 def getNameById(id):
     return summonerSpells[id]
 
@@ -86,6 +122,8 @@ def getChampionByID(championInfo, championID):
     for championNames in championInfo["data"]:
         if str(championID) == championInfo["data"][championNames]["key"]:
             return championNames
+    if championID == -1:
+        return "unknown"
     print("[ERROR] Unknown Champion ID: {}".format(championID))
     return "No Champion with ID: {}".format(championID)
 
