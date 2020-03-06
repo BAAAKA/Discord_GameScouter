@@ -27,7 +27,7 @@ async def on_message(message):
     if message.channel.id in channelID:
         if message.author == client.user:
             return
-        if "lol" == message.content.lower():
+        if "lol:" == message.content.lower():
             await message.channel.send('rito sux')
         if "su:" in message.content.lower():
             returnText = getSummonerInfo(message)

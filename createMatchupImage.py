@@ -33,9 +33,9 @@ def getMatchImage(matchInfo):
         name2 = getNameById(summoners[summoner]["spell2Id"])
         summoners[summoner]["spell1Image"] = Image.open(getLocalSummonersImage(name1))
         summoners[summoner]["spell2Image"] = Image.open(getLocalSummonersImage(name2))
-
         prekId = summoners[summoner]["perks"]["perkIds"][0]
         summoners[summoner]["perkImage"] = Image.open(getLocalPerkImage(prekId))
+
 
     #Post Champion, Summonername and Tier
     for summonerNr in summoners:

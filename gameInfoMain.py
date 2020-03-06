@@ -1,3 +1,4 @@
+import operator
 import re
 import discord
 from urllib.parse import quote
@@ -79,10 +80,17 @@ def getMatchInfo(message):
                     summoner["tier"] = Tier
                     summoner["RankTier"] = summonerRank
                 #MatchList
-                print("###MATCHLISTINFO TEST")
-                #matchListInfo = getMatchListApiInfo(summoner["summonerId"])
-                #for match in matchListInfo:
-                #    print(match["lane"])
+                summonerInfo = getSummonerApiInfo(summoner["summonerName"])
+                matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
+                laneCount = getLanePlayCount(matchListInfo)
+                print(laneCount)
+                mostPlayedLane = max(laneCount.items(), key=operator.itemgetter(1))
+                print("{} {}%".format(mostPlayedLane[0], mostPlayedLane[1]))
+
+                championCount = getChampionPlayCount(matchListInfo)
+                mostPlayedChampionID = max(championCount.items(), key=operator.itemgetter(1))
+                mostPlayedChampion = getChampionByID(championInfo, mostPlayedChampionID[0])
+                print(mostPlayedChampion)
 
             filePath=getMatchImage(matchInfo)
             embedMessage = discord.Embed(color=0x0099ff)
@@ -93,7 +101,9 @@ def getMatchInfo(message):
         returnText = "Summoner does not exist!"
     return returnText
 
-##############
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
 
 def getSplashURL(champion):
     url="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
@@ -172,6 +182,24 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
 
 def getSummonerMasteryInfoDetails(masteryInfo, placed):
     return masteryInfo[placed-1]
+
+def getLanePlayCount(matchListInfo):
+    laneCount = {}
+    for match in matchListInfo["matches"]:
+        lane = match["lane"]
+        if lane not in laneCount:
+            laneCount[lane] = 0
+        laneCount[lane] += 1
+    return laneCount
+
+def getChampionPlayCount(matchListInfo):
+    championCount = {}
+    for match in matchListInfo["matches"]:
+        champion = match["champion"]
+        if champion not in championCount:
+            championCount[champion] = 0
+        championCount[champion] += 1
+    return championCount
 
 def getHelpText():
     embedMessage = discord.Embed(title = "Help",color=0x0099ff)
