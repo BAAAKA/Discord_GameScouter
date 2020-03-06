@@ -4,10 +4,12 @@ import discord
 from urllib.parse import quote
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
+import time
 
 
 def getSummonerInfo(message):
     print("========================NEW SUMMONER INFO REQUEST========================")
+    start_time = time.time()
     summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title=summonerName, color=0x0099ff)
@@ -62,11 +64,13 @@ def getSummonerInfo(message):
         embedMessage.description = "Summoner does not exist"
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
+    print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
     return embedMessage
 
 
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
+    start_time = time.time()
     summonerName = message.content.split("ig:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
 
@@ -115,7 +119,12 @@ def getMatchInfo(message):
                     del championCount[mostPlayedChamp[i][0]]
                 summoner["mostPlayedChamps"] = mostPlayedChamp
 
+            print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
+            start_timeImage = time.time()
             filePath = getMatchImage(matchInfo)
+            print("[INFO] ----------------- %s seconds for the creation of the image -----------------" % (time.time() - start_timeImage))
+            print("[INFO] ----------------- %s seconds for total match request -----------------" % (time.time() - start_time))
+
             embedMessage = discord.Embed(color=0x0099ff)
             embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
             embedMessage.set_image(url="attachment://matchImage.png")
@@ -215,7 +224,6 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
 
 def getSummonerMasteryInfoDetails(masteryInfo, placed):
     return masteryInfo[placed - 1]
-
 
 def getLanePlayCount(matchListInfo):
     laneCount = {}

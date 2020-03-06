@@ -40,12 +40,12 @@ perks[8229] = "Sorcery","ArcaneComet"
 perks[8230] = "Sorcery","PhaseRush"
 
 perks[8351] = "Inspiration","GlacialAugment"
-perks[83] = "Inspiration","GlacialAugment"
+perks[8360] = "Inspiration","UnsealedSpellbook"
 perks[83] = "Inspiration","GlacialAugment"
 
 perks[8437] = "Resolve","GraspOfTheUndying"
 perks[8439] = "Resolve","VeteranAftershock"
-perks[84] = "Resolve","VeteranAftershock"
+perks[8465] = "Resolve","Guardian"
 
 
 if os.name == "nt":
