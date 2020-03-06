@@ -36,8 +36,7 @@ def getMatchImage(matchInfo):
         prekId = summoners[summoner]["perks"]["perkIds"][0]
         summoners[summoner]["perkImage"] = Image.open(getLocalPerkImage(prekId))
 
-
-    #Post Champion, Summonername and Tier
+    # Post Champion, Summonername and Tier
     for summonerNr in summoners:
         x = startPositions[summonerNr][0]
         y = startPositions[summonerNr][1]
@@ -52,16 +51,20 @@ def getMatchImage(matchInfo):
         imageArena.paste(summoners[summonerNr]["spell1Image"], getAreaOfSpells(x, y + 400))
         imageArena.paste(summoners[summonerNr]["spell2Image"], getAreaOfSpells(x+64, y + 400))
 
-        #Perkz
+        # Perkz
         prekId = summoners[summonerNr]["perks"]["perkIds"][0]
         print("{}: {}".format(summoners[summonerNr]["summonerName"], prekId))
         image=summoners[summonerNr]["perkImage"]
         imageEdited = image.resize((64,64))
         imageArena.paste(imageEdited, getAreaOfCustom(x+128, y + 400, 64), mask=imageEdited)
 
+        # Most Played Lane
+        d.text((x, y + 600), summoners[summonerNr]["mostPlayedLanes"][0][0], font=fnt35, fill=(255, 255, 255))
 
+        # Most Played Champ
+        d.text((x, y + 650), summoners[summonerNr]["mostPlayedChamps"][0][2], font=fnt35, fill=(255, 255, 255))
 
-    #MIDDLEPART
+    # MIDDLEPART
     middleImageX = 100
     middleImageY = 920
 
