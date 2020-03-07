@@ -6,6 +6,9 @@ from gameInfoRequests import getChampionInformation
 from pathlib import Path
 
 import time
+def getFontSized(size):
+    return ImageFont.truetype(getFont(), size)
+
 def getMatchImage(matchInfo):
     print("[INFO] getMatchImage!")
     imageArena = getArenaClean()
@@ -13,9 +16,6 @@ def getMatchImage(matchInfo):
     summoners = {}
 
     startPositions = getStartPositions()
-    fnt = ImageFont.truetype(getFont(), 50)
-    fnt42 = ImageFont.truetype(getFont(), 42)
-    fnt35 = ImageFont.truetype(getFont(), 35)
     d = ImageDraw.Draw(imageArena)
 
     x=1
@@ -40,14 +40,26 @@ def getMatchImage(matchInfo):
     for summonerNr in summoners:
         x = startPositions[summonerNr][0]
         y = startPositions[summonerNr][1]
+        # Champion
         imageArena.paste(summoners[summonerNr]["championImage"], getAreaOfTitles(x, y))
-        imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x+20, y+200), mask=summoners[summonerNr]["tierImage"])
-        if len(summoners[summonerNr]["summonerName"]) < 12:
-            d.text((x, y-70),summoners[summonerNr]["summonerName"], font=fnt, fill=(255, 255, 255))
-        else:
-            d.text((x, y-60),summoners[summonerNr]["summonerName"], font=fnt42, fill=(255, 255, 255))
 
-        d.text((x, y + 480), summoners[summonerNr]["RankTier"], font=fnt35, fill=(255, 255, 255))
+        #Rank
+        imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x+40, y+200), mask=summoners[summonerNr]["tierImage"])
+        d.text((x, y + 480), summoners[summonerNr]["RankTier"], font=getFontSized(30), fill=(255, 255, 255))
+        wins = summoners[summonerNr]["wins"]
+        losses = summoners[summonerNr]["losses"]
+        winRate = summoners[summonerNr]["winRate"]
+        rankedStats = "{}% {}W/{}L".format(winRate, wins, losses)
+        d.text((x, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
+
+
+        #Summonername
+        if len(summoners[summonerNr]["summonerName"]) < 12:
+            d.text((x, y-70),summoners[summonerNr]["summonerName"], font=getFontSized(50), fill=(255, 255, 255))
+        else:
+            d.text((x, y-60),summoners[summonerNr]["summonerName"], font=getFontSized(42), fill=(255, 255, 255))
+
+        #Summoners
         imageArena.paste(summoners[summonerNr]["spell1Image"], getAreaOfSpells(x, y + 400))
         imageArena.paste(summoners[summonerNr]["spell2Image"], getAreaOfSpells(x+64, y + 400))
 
@@ -59,21 +71,26 @@ def getMatchImage(matchInfo):
         imageArena.paste(imageEdited, getAreaOfCustom(x+128, y + 400, 64), mask=imageEdited)
 
         # Most Played Lane
-        d.text((x, y + 600), summoners[summonerNr]["mostPlayedLanes"][0][0], font=fnt35, fill=(255, 255, 255))
+        mostPlayedLane = summoners[summonerNr]["mostPlayedLanes"][0][0]
+        if mostPlayedLane == "DUO_CARRY":
+            mostPlayedLane = "ADC"
+        elif mostPlayedLane == "DUO_SUPPORT":
+            mostPlayedLane = "SUPPORT"
+        d.text((x, y + 600), "Main role: {}".format(mostPlayedLane), font=getFontSized(25), fill=(255, 255, 255))
 
         # Most Played Champ
-        d.text((x, y + 650), summoners[summonerNr]["mostPlayedChamps"][0][2], font=fnt35, fill=(255, 255, 255))
+        mostPlayedChamp = summoners[summonerNr]["mostPlayedChamps"][0][2]
+        d.text((x, y + 630), "Main champ: {}".format(mostPlayedChamp), font=getFontSized(25), fill=(255, 255, 255))
 
     # MIDDLEPART
     middleImageX = 100
     middleImageY = 920
 
-    d.text((middleImageX, middleImageY), "Gamemode: "+matchInfo["gameMode"], font=fnt35, fill=(255, 255, 255))
-    d.text((middleImageX+600, middleImageY), "Map: "+getMapById(matchInfo["mapId"]), font=fnt35, fill=(255, 255, 255))
-    d.text((middleImageX+1540, middleImageY), "Bans: ", font=fnt35, fill=(255, 255, 255))
+    d.text((middleImageX, middleImageY), "Gamemode: "+matchInfo["gameMode"], font=getFontSized(35), fill=(255, 255, 255))
+    d.text((middleImageX+600, middleImageY), "Map: "+getMapById(matchInfo["mapId"]), font=getFontSized(35), fill=(255, 255, 255))
+    d.text((middleImageX+1540, middleImageY), "Bans: ", font=getFontSized(35), fill=(255, 255, 255))
 
     # BANNED CHAMPIONS
-    print(matchInfo["bannedChampions"])
     championInfo = getChampionInformation()
     imageSize = 80
     turns = 1

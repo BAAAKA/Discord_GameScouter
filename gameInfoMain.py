@@ -92,11 +92,19 @@ def getMatchInfo(message):
                     summonerRank = "Unranked"
                     summoner["tier"] = summonerRank
                     summoner["RankTier"] = summonerRank
+                    summoner["wins"] = "0"
+                    summoner["losses"] = "0"
+                    summoner["winRate"] = "0"
+
                 else:
                     Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
                     summonerRank = Tier + " " + Rank
                     summoner["tier"] = Tier
                     summoner["RankTier"] = summonerRank
+                    summoner["wins"] = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins")
+                    summoner["losses"] = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses")
+                    summoner["winRate"] = getWinrate(queueTypeInfo, "RANKED_SOLO_5x5")
+
 
                 # MatchList
                 summonerInfo = getSummonerApiInfo(summoner["summonerName"])

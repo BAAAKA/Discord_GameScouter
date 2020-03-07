@@ -34,6 +34,7 @@ perks[8021] = "Precision","FleetFootwork"
 perks[8112] = "Domination","Electrocute"
 perks[8128] = "Domination","DarkHarvest"
 perks[8110] = "Domination","DarkHarvest"
+perks[9923] = "Domination","HailOfBlades"
 
 perks[8214] = "Sorcery","SummonAery"
 perks[8229] = "Sorcery","ArcaneComet"

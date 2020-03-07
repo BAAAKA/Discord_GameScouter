@@ -47,7 +47,7 @@ def getMatchListApiInfo(accountId):
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, accountId, riotApiKey)
     print("[INFO] REQUESTURL MatchList: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
-    print("[INFO] MatchList: {}".format(requestData))
+    #print("[INFO] MatchList: {}".format(requestData))
     return requestData
 
 def getMatchApiInfo(summonerID):
