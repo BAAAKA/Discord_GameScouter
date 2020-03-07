@@ -131,10 +131,9 @@ def getMatchInfo(message):
                 # Lane in this match
                 if not lanes:
                     lanes = ["Top", "Jungle", "Mid", "ADC", "Support"]
-                lane = getLane(summoner["spell1Id"], summoner["spell2Id"], lanes)
+                lane = getLane(summoner["spell1Id"], summoner["spell2Id"], lanes, summoner["mostPlayedLanes"])
                 lanes.remove(lane)
                 summoner["lane"] = lane
-                print("Summoner {}, LANE: {}".format(summoner["summonerName"], summoner["lane"]))
 
             print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
             start_timeImage = time.time()
@@ -169,12 +168,12 @@ def getFooterText(type):
     else:
         print("[ERROR] Unknown footer type")
         return None
-def getLane(spell1, spell2, lanes):
+
+def getLane(spell1, spell2, lanes, mainLane):
     spell = getNameById(spell1)
     if getNameById(spell1) == "Flash":
         spell = getNameById(spell2)
-    print("Summonerspell: {}".format(spell))
-    topSpells = ["Ignite","Teleport"]
+    topSpells = ["Teleport","Ignite"]
     jungleSpells = ["Smite"]
     midSpells = ["Ignite","Cleanse","Barrier"]
     adcSpells = ["Heal"]
@@ -194,7 +193,8 @@ def getLane(spell1, spell2, lanes):
     if "Support" in lanes:
         if spell in supportSpells:
             return "Support"
-    print(lanes)
+    if mainLane in lanes:
+        return mainLane
     return lanes[0]
 
 def getMasteryChampion(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
