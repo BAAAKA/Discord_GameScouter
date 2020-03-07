@@ -247,18 +247,14 @@ def getSummoners():
 yStartTeam1 = 100
 yStartTeam2 = 1245
 startPositions = {}
-startPositions["1"] = (0, yStartTeam1)
-startPositions["2"] = (500, yStartTeam1)
-startPositions["3"] = (1000, yStartTeam1)
-startPositions["4"] = (1500, yStartTeam1)
-startPositions["5"] = (2000, yStartTeam1)
-startPositions["6"] = (0, yStartTeam2)
-startPositions["7"] = (500, yStartTeam2)
-startPositions["8"] = (1000, yStartTeam2)
-startPositions["9"] = (1500, yStartTeam2)
-startPositions["10"] = (2000, yStartTeam2)
+startPositions["Top"] = 0
+startPositions["Jungle"] = 500
+startPositions["Mid"] = 1000
+startPositions["ADC"] = 1500
+startPositions["Support"] = 2000
+
 
 def getStartPositions():
-    return startPositions
+    return startPositions, yStartTeam1, yStartTeam2
 
 

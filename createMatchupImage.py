@@ -38,19 +38,25 @@ def getMatchImage(matchInfo):
 
     # Post Champion, Summonername and Tier
     for summonerNr in summoners:
-        x = startPositions[summonerNr][0]
-        y = startPositions[summonerNr][1]
+        summonerLane = summoners[summonerNr]["lane"]
+        x = startPositions[0][summonerLane]
+        if summoners[summonerNr]["teamId"] == 100:
+            y = startPositions[1]
+        else:
+            y = startPositions[2]
+
         # Champion
         imageArena.paste(summoners[summonerNr]["championImage"], getAreaOfTitles(x, y))
 
         #Rank
         imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x+40, y+200), mask=summoners[summonerNr]["tierImage"])
         d.text((x, y + 480), summoners[summonerNr]["RankTier"], font=getFontSized(30), fill=(255, 255, 255))
-        wins = summoners[summonerNr]["wins"]
-        losses = summoners[summonerNr]["losses"]
-        winRate = summoners[summonerNr]["winRate"]
-        rankedStats = "{}% {}W/{}L".format(winRate, wins, losses)
-        d.text((x, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
+        if not "Unranked" == summoners[summonerNr]["RankTier"]:
+            wins = summoners[summonerNr]["wins"]
+            losses = summoners[summonerNr]["losses"]
+            winRate = summoners[summonerNr]["winRate"]
+            rankedStats = "{}% {}W/{}L".format(winRate, wins, losses)
+            d.text((x, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
 
 
         #Summonername
@@ -81,6 +87,10 @@ def getMatchImage(matchInfo):
         # Most Played Champ
         mostPlayedChamp = summoners[summonerNr]["mostPlayedChamps"][0][2]
         d.text((x, y + 630), "Main champ: {}".format(mostPlayedChamp), font=getFontSized(25), fill=(255, 255, 255))
+
+        # Lane
+        lane = summoners[summonerNr]["lane"]
+        d.text((x, y + 660), "Lane: {}".format(lane), font=getFontSized(25), fill=(255, 255, 255))
 
     # MIDDLEPART
     middleImageX = 100

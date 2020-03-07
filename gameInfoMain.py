@@ -4,6 +4,7 @@ import discord
 from urllib.parse import quote
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
+from matchData import getNameById
 import time
 
 
@@ -80,8 +81,8 @@ def getMatchInfo(message):
             returnText = "This summoner is not ingame right now..."
         else:
             # here you know that the summoner exists and is ingame
+            lanes = []
             championInfo = getChampionInformation()
-
             for summoner in matchInfo["participants"]:
                 # Champion
                 summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
@@ -127,6 +128,14 @@ def getMatchInfo(message):
                     del championCount[mostPlayedChamp[i][0]]
                 summoner["mostPlayedChamps"] = mostPlayedChamp
 
+                # Lane in this match
+                if not lanes:
+                    lanes = ["Top", "Jungle", "Mid", "ADC", "Support"]
+                lane = getLane(summoner["spell1Id"], summoner["spell2Id"], lanes)
+                lanes.remove(lane)
+                summoner["lane"] = lane
+                print("Summoner {}, LANE: {}".format(summoner["summonerName"], summoner["lane"]))
+
             print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
             start_timeImage = time.time()
             filePath = getMatchImage(matchInfo)
@@ -150,9 +159,8 @@ def getSplashURL(champion):
     url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
     return url
 
-
 def getFooterText(type):
-    text = 'gameScouter V2.1 - Commit 24'
+    text = 'gameScouter V2.5 - Commit 38'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
@@ -161,7 +169,33 @@ def getFooterText(type):
     else:
         print("[ERROR] Unknown footer type")
         return None
-
+def getLane(spell1, spell2, lanes):
+    spell = getNameById(spell1)
+    if getNameById(spell1) == "Flash":
+        spell = getNameById(spell2)
+    print("Summonerspell: {}".format(spell))
+    topSpells = ["Ignite","Teleport"]
+    jungleSpells = ["Smite"]
+    midSpells = ["Ignite","Cleanse","Barrier"]
+    adcSpells = ["Heal"]
+    supportSpells = ["Ignite","Exhaust"]
+    if "Mid" in lanes:
+        if spell in midSpells:
+            return "Mid"
+    if "Top" in lanes:
+        if spell in topSpells:
+            return "Top"
+    if "Jungle" in lanes:
+        if spell in jungleSpells:
+            return "Jungle"
+    if "ADC" in lanes:
+        if spell in adcSpells:
+            return "ADC"
+    if "Support" in lanes:
+        if spell in supportSpells:
+            return "Support"
+    print(lanes)
+    return lanes[0]
 
 def getMasteryChampion(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
     mostPlayedChamp1 = getChampionByID(getChampionInformation(), MasteryInfoDetails1["championId"])
