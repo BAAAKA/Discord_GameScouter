@@ -2,10 +2,9 @@ import sys
 from PIL import Image, ImageDraw, ImageFont
 from matchData import *
 from gameInfoRequests import getChampionInformation
-
 from pathlib import Path
-
 import time
+
 def getFontSized(size):
     return ImageFont.truetype(getFont(), size)
 

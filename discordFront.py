@@ -1,8 +1,6 @@
 import discord
 from dotenv import load_dotenv
 import os
-import re
-from pathlib import Path
 from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
 
 iboisChannelID = 594973116019638515

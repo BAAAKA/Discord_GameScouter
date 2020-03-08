@@ -5,6 +5,7 @@ from urllib.parse import quote
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
 from matchData import getNameById
+import asyncio
 import time
 
 
@@ -83,12 +84,32 @@ def getMatchInfo(message):
             # here you know that the summoner exists and is ingame
             lanes = []
             championInfo = getChampionInformation()
+            #Async all getSummonerRank requests
+            summonerIDArray = []
+            x = 0
             for summoner in matchInfo["participants"]:
-                # Champion
-                summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
-                # rank
-                queueTypeInfo = getSummonerRankApiInfo(summoner["summonerId"])
-                Tier = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "tier")
+                summoner["number"] = x
+                x+=1
+                summonerIDArray.append(summoner["summonerId"])
+            summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
+            # Async all summonerInfo requests
+            summonerNameArray = []
+            for summoner in matchInfo["participants"]:
+                summonerNameArray.append(summoner["summonerName"])
+            summonerInfos = getSummonerApiInfoArray(summonerNameArray)
+            # Async all matchListInfo requests
+            accountIdArray = []
+            for summoner in summonerInfos:
+                summoner = summoner.json()
+                accountIdArray.append(summoner["accountId"])
+            matchListInfos = getMatchListApiInfoArray(accountIdArray)
+
+            #Set All Data
+            for summoner in matchInfo["participants"]:
+                rankInfo = summonerRanks[summoner["number"]].json()
+                matchListInfo = matchListInfos[summoner["number"]].json()
+
+                Tier = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "tier")
                 if re.search("SUMMONER HAS NO RANK*", Tier):
                     summonerRank = "Unranked"
                     summoner["tier"] = summonerRank
@@ -98,18 +119,15 @@ def getMatchInfo(message):
                     summoner["winRate"] = "0"
 
                 else:
-                    Rank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
+                    Rank = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "rank")
                     summonerRank = Tier + " " + Rank
                     summoner["tier"] = Tier
                     summoner["RankTier"] = summonerRank
-                    summoner["wins"] = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins")
-                    summoner["losses"] = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses")
-                    summoner["winRate"] = getWinrate(queueTypeInfo, "RANKED_SOLO_5x5")
-
-
-                # MatchList
-                summonerInfo = getSummonerApiInfo(summoner["summonerName"])
-                matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
+                    summoner["wins"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "wins")
+                    summoner["losses"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "losses")
+                    summoner["winRate"] = getWinrate(rankInfo, "RANKED_SOLO_5x5")
+                # Champion
+                summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
                 # Lanes
                 laneCount = getLanePlayCount(matchListInfo)
                 mostPlayedLane = []
@@ -159,7 +177,7 @@ def getSplashURL(champion):
     return url
 
 def getFooterText(type):
-    text = 'gameScouter V2.5 - Commit 38'
+    text = 'gameScouter V3.0 - Commit 42'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
@@ -269,6 +287,7 @@ def getSummonerMasteryInfoDetails(masteryInfo, placed):
 
 def getLanePlayCount(matchListInfo):
     laneCount = {}
+    print(matchListInfo)
     for match in matchListInfo["matches"]:
         lane = match["lane"]
         if lane == "BOTTOM":
