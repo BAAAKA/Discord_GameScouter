@@ -1,17 +1,20 @@
 import discord
 from dotenv import load_dotenv
 import os
-from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText
+from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
 
 iboisChannelID = 594973116019638515
 botTestingID = 649304929613250560
 myServerID = 682327435370430567
+DnDServer = 687363534740258849
+
 channelID = []
 if os.name == "nt":
     channelID.append(botTestingID)
 else:
     channelID.append(iboisChannelID)
     channelID.append(myServerID)
+    channelID.append(DnDServer)
 
 # GetToken
 token = os.environ['discordToken']
@@ -29,10 +32,11 @@ async def on_message(message):
             await message.channel.send('rito sux')
         if "su:" in message.content.lower():
             returnText = getSummonerInfo(message)
+            image = discord.File(returnText[1], filename="matchImage.png")  # FIX THIS
             if isinstance(returnText, str):
                 await message.channel.send(returnText)
                 return
-            await message.channel.send(embed=returnText)
+            await message.channel.send(set_thumbnail=image, embed=returnText[0])
 
         if "ig:" in message.content.lower():
             loadingMessage = await message.channel.send("processing your request...")
@@ -49,6 +53,9 @@ async def on_message(message):
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())
+
+        if "info:" in message.content.lower():
+            await message.channel.send(embed=getInfoText())
 
         if "test:" in message.content.lower():
             await message.channel.send(embed="")

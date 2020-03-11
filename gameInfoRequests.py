@@ -65,8 +65,6 @@ def getMatchListApiInfoArray(accountIdArray):
         print("[INFO] REQUESTURL MatchList: " + url)
         urls.append(grequests.get(url))
     result = grequests.map(urls)
-    # for response in result:
-        # print("[INFO] MatchList: {}".format(response.json()))
     return result
 
 def getSummonerApiInfo(summonerName):

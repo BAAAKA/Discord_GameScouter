@@ -7,6 +7,7 @@ imageRankFolder = r"data/ranked-emblems"
 imageTitlesFolder = r"data/img/champion/tiles"
 imageSummonersFolder = r"data/summonerSpells"
 imagePerkFolder = r"data/perks"
+imagePIconFolder = r"data/profileicon"
 imageArenaPath = Path(r"data/img/global/arena.png")
 imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
@@ -32,8 +33,8 @@ perks[8010] = "Precision","Conqueror"
 perks[8021] = "Precision","FleetFootwork"
 
 perks[8112] = "Domination","Electrocute"
+perks[8124] = "Domination","Predator"
 perks[8128] = "Domination","DarkHarvest"
-perks[8110] = "Domination","DarkHarvest"
 perks[9923] = "Domination","HailOfBlades"
 
 perks[8214] = "Sorcery","SummonAery"
@@ -78,6 +79,10 @@ def getLocalLoadingImage(champion):
 
 def getLocalTitlesImage(champion):
     path = Path(imageTitlesFolder + "/{}_0.jpg".format(champion))
+    return path
+
+def getLocalPIconImage(icon):
+    path = Path(imagePIconFolder + "/{}.png".format(icon))
     return path
 
 def getLocalRankedImage(rank):

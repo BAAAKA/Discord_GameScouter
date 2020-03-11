@@ -11,7 +11,6 @@ def getFontSized(size):
 def getMatchImage(matchInfo):
     print("[INFO] getMatchImage!")
     imageArena = getArenaClean()
-    #summoners = getSummoners()
     summoners = {}
 
     startPositions = getStartPositions()
@@ -49,20 +48,20 @@ def getMatchImage(matchInfo):
 
         #Rank
         imageArena.paste(summoners[summonerNr]["tierImage"], getAreaOfEmblem(x+40, y+200), mask=summoners[summonerNr]["tierImage"])
-        d.text((x, y + 480), summoners[summonerNr]["RankTier"], font=getFontSized(30), fill=(255, 255, 255))
+        d.text((x+5, y + 480), summoners[summonerNr]["RankTier"], font=getFontSized(30), fill=(255, 255, 255))
         if not "Unranked" == summoners[summonerNr]["RankTier"]:
             wins = summoners[summonerNr]["wins"]
             losses = summoners[summonerNr]["losses"]
             winRate = summoners[summonerNr]["winRate"]
             rankedStats = "{}% {}W/{}L".format(winRate, wins, losses)
-            d.text((x, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
+            d.text((x+5, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
 
 
         #Summonername
         if len(summoners[summonerNr]["summonerName"]) < 12:
-            d.text((x, y-70),summoners[summonerNr]["summonerName"], font=getFontSized(50), fill=(255, 255, 255))
+            d.text((x+10, y-70),summoners[summonerNr]["summonerName"], font=getFontSized(50), fill=(255, 255, 255))
         else:
-            d.text((x, y-60),summoners[summonerNr]["summonerName"], font=getFontSized(42), fill=(255, 255, 255))
+            d.text((x+10, y-60),summoners[summonerNr]["summonerName"], font=getFontSized(42), fill=(255, 255, 255))
 
         #Summoners
         imageArena.paste(summoners[summonerNr]["spell1Image"], getAreaOfSpells(x, y + 400))
@@ -81,15 +80,15 @@ def getMatchImage(matchInfo):
             mostPlayedLane = "ADC"
         elif mostPlayedLane == "DUO_SUPPORT":
             mostPlayedLane = "SUPPORT"
-        d.text((x, y + 600), "Main role: {}".format(mostPlayedLane), font=getFontSized(25), fill=(255, 255, 255))
+        d.text((x+5, y + 600), "Main role: {}".format(mostPlayedLane), font=getFontSized(25), fill=(255, 255, 255))
 
         # Most Played Champ
         mostPlayedChamp = summoners[summonerNr]["mostPlayedChamps"][0][2]
-        d.text((x, y + 630), "Main champ: {}".format(mostPlayedChamp), font=getFontSized(25), fill=(255, 255, 255))
+        d.text((x+5, y + 630), "Main champ: {}".format(mostPlayedChamp), font=getFontSized(25), fill=(255, 255, 255))
 
         # Lane
         lane = summoners[summonerNr]["lane"]
-        d.text((x, y + 660), "Lane: {}".format(lane), font=getFontSized(25), fill=(255, 255, 255))
+        d.text((x+5, y + 660), "Lane: {}".format(lane), font=getFontSized(25), fill=(255, 255, 255))
 
     # MIDDLEPART
     middleImageX = 100

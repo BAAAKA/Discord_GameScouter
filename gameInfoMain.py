@@ -4,7 +4,7 @@ import discord
 from urllib.parse import quote
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
-from matchData import getNameById
+from matchData import getNameById, getLocalPIconImage
 import asyncio
 import time
 
@@ -18,7 +18,7 @@ def getSummonerInfo(message):
 
     if getSummonerExistance(summonerInfo):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
-        embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"]))
+        thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -67,7 +67,7 @@ def getSummonerInfo(message):
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
     print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
-    return embedMessage
+    return embedMessage, thumbnailPath
 
 
 def getMatchInfo(message):
@@ -148,7 +148,7 @@ def getMatchInfo(message):
 
                 # Lane in this match
                 if not lanes:
-                    lanes = ["Top", "Jungle", "Mid", "ADC", "Support"]
+                    lanes = ["Top", "Mid", "Support", "ADC", "Jungle"]
                 lane = getLane(summoner["spell1Id"], summoner["spell2Id"], lanes, summoner["mostPlayedLanes"])
                 lanes.remove(lane)
                 summoner["lane"] = lane
@@ -287,7 +287,10 @@ def getSummonerMasteryInfoDetails(masteryInfo, placed):
 
 def getLanePlayCount(matchListInfo):
     laneCount = {}
-    print(matchListInfo)
+    try:
+        matchListInfo["matches"]
+    except:
+        print("[ERROR] No <matches> found, matchListInfo: {}".format(matchListInfo))
     for match in matchListInfo["matches"]:
         lane = match["lane"]
         if lane == "BOTTOM":
@@ -310,11 +313,17 @@ def getChampionPlayCount(matchListInfo):
 
 def getHelpText():
     embedMessage = discord.Embed(title="Help", color=0x0099ff)
-    embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details",
-                           inline=False)
+    embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details", inline=False)
     embedMessage.add_field(name="**ig: <Summonername>** ", value="Match Details - lists game details", inline=False)
+    embedMessage.add_field(name="**help:** ", value="You get some info... like this", inline=False)
+    embedMessage.add_field(name="**info:** ", value="Information about the bot", inline=False)
     return embedMessage
 
+def getInfoText():
+    embedMessage = discord.Embed(title="Help", color=0x0099ff)
+    embedMessage.add_field(name="**Creator** ", value="https://github.com/BAAAKA", inline=False)
+    embedMessage.add_field(name="**What is this** ", value="Bot that gives you league summoner and match information", inline=False)
+    return embedMessage
 
 def getMatchReturnText(matchInfo):
     summoners = []
