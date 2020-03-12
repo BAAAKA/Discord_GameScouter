@@ -28,16 +28,17 @@ async def on_message(message):
     if message.channel.id in channelID:
         if message.author == client.user:
             return
+
         if "lol:" == message.content.lower():
             await message.channel.send('rito sux')
+
         if "su:" in message.content.lower():
             returnText = getSummonerInfo(message)
-            image = discord.File(returnText[1], filename="matchImage.png")  # FIX THIS
             if isinstance(returnText, str):
                 await message.channel.send(returnText)
                 return
-            await message.channel.send(set_thumbnail=image, embed=returnText[0])
-
+            await message.channel.send(embed=returnText)
+        
         if "ig:" in message.content.lower():
             loadingMessage = await message.channel.send("processing your request...")
             loadingMessageFetched = await message.channel.fetch_message(loadingMessage.id)
@@ -49,7 +50,6 @@ async def on_message(message):
             image = discord.File(returnText[1], filename="matchImage.png")
             await message.channel.send(file=image, embed=returnText[0])
             await loadingMessageFetched.delete()
-
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())

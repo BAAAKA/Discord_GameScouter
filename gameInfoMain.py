@@ -18,7 +18,8 @@ def getSummonerInfo(message):
 
     if getSummonerExistance(summonerInfo):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
-        thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
+        embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"]))
+        #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -67,7 +68,7 @@ def getSummonerInfo(message):
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
     print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
-    return embedMessage, thumbnailPath
+    return embedMessage
 
 
 def getMatchInfo(message):
@@ -356,3 +357,12 @@ def getMatchReturnText(matchInfo):
 
     returnText += "```"
     return returnText
+
+infoText = getFooterText("text")
+print("""
+###############################################
+        Discord gameScouter!
+        {}
+        Made by: KAWAII BAAAKA
+###############################################
+""".format(infoText))

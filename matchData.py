@@ -51,10 +51,10 @@ perks[8465] = "Resolve","Guardian"
 
 
 if os.name == "nt":
-    print("WINDOWS FONT")
+    print("[INFO] WINDOWS FONT")
     fontPath = r"D:\Programme\pyCharm\jbr\lib\fonts\SourceCodePro-Bold.ttf"
 else:
-    print("LINUX FONT")
+    print("[INFO] LINUX FONT")
     fontPath = r"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 
