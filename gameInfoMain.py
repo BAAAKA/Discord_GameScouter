@@ -7,6 +7,7 @@ from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalPIconImage
 import asyncio
 import time
+import pymysql
 
 
 def getSummonerInfo(message):
@@ -70,13 +71,21 @@ def getSummonerInfo(message):
     print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
     return embedMessage
 
-
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
     start_time = time.time()
     summonerName = message.content.split("ig:", 1)[1]
-    summonerInfo = getSummonerApiInfo(summonerName)
+    if summonerName == "":
+        gsDBpw = os.environ['gsDBpw']
+        connection = pymysql.connect(
+            '192.168.0.27',
+            'gsUser',
+            gsDBpw,
+            'gameScouterDB',
+        )
+        summonerName = getDB(connection, message.author)
 
+    summonerInfo = getSummonerApiInfo(summonerName)
     if getSummonerExistance(summonerInfo):
         matchInfo = getMatchApiInfo(summonerInfo["id"])
         if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
@@ -168,10 +177,45 @@ def getMatchInfo(message):
         returnText = "Summoner does not exist!"
     return returnText
 
+def setSummonername(message):
+    print("========================Setting Summonername========================")
+    gsDBpw = os.environ['gsDBpw']
+    connection = pymysql.connect(
+        '192.168.0.27',
+        'gsUser',
+        gsDBpw,
+        'gameScouterDB',
+    )
+    summonerName = message.content.split("setname:", 1)[1]
+    sName = str(summonerName)
+    dName = str(message.author)
+    result = setDB(connection, sName, dName)
+    return result
 
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
+
+def setDB(connection, sName, dName):
+    try:
+        with connection:
+            cur = connection.cursor()
+            cur.execute("INSERT INTO summoners (sName, dName) VALUES (%s,%s)", (sName, dName))
+        connection.commit()
+        print("[INFO] Successfully set Summonername")
+        return "Success!"
+    except Exception as e:
+        print("[ERROR] unsuccessful in setting the Summonername!")
+        print("[ERROR] Message: {}".format(e))
+        return "unsuccessful"
+
+def getDB(connection, dName):
+    with connection:
+        cur = connection.cursor()
+        cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
+        sName = cur.fetchone()[0]
+        print("[INFO] Successfully got Summonername: {}".format(sName))
+        return sName
 
 def getSplashURL(champion):
     url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)

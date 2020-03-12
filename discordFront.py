@@ -1,7 +1,7 @@
 import discord
 from dotenv import load_dotenv
 import os
-from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
+from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText, setSummonername
 
 iboisChannelID = 594973116019638515
 botTestingID = 649304929613250560
@@ -50,6 +50,10 @@ async def on_message(message):
             image = discord.File(returnText[1], filename="matchImage.png")
             await message.channel.send(file=image, embed=returnText[0])
             await loadingMessageFetched.delete()
+
+        if "setname:" in message.content.lower():
+            returnText = setSummonername(message)
+            await message.channel.send(returnText)
 
         if "help:" in message.content.lower():
             await message.channel.send(embed=getHelpText())
