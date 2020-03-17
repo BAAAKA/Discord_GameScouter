@@ -13,7 +13,10 @@ import pymysql
 def getSummonerInfo(message):
     print("========================NEW SUMMONER INFO REQUEST========================")
     start_time = time.time()
-    summonerName = message.content.split("su:", 1)[1]
+    if isinstance(message, str):
+        summonerName = message.split("su:", 1)[1]
+    else:
+        summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title=summonerName, color=0x0099ff)
 
@@ -74,11 +77,14 @@ def getSummonerInfo(message):
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
     start_time = time.time()
-    summonerName = message.content.split("ig:", 1)[1]
+    if isinstance(message, str):
+        summonerName = message.split("ig:", 1)[1]
+    else:
+        summonerName = message.content.split("ig:", 1)[1]
     if summonerName == "":
         gsDBpw = os.environ['gsDBpw']
         connection = pymysql.connect(
-            '192.168.0.27',
+            '192.168.0.28',
             'gsUser',
             gsDBpw,
             'gameScouterDB',
@@ -181,7 +187,7 @@ def setSummonername(message):
     print("========================Setting Summonername========================")
     gsDBpw = os.environ['gsDBpw']
     connection = pymysql.connect(
-        '192.168.0.27',
+        '192.168.0.28',
         'gsUser',
         gsDBpw,
         'gameScouterDB',
@@ -191,6 +197,54 @@ def setSummonername(message):
     dName = str(message.author)
     result = setDB(connection, sName, dName)
     return result
+
+def getMyGame(message):
+    print("========================Getting Discord Name Game========================")
+    gsDBpw = os.environ['gsDBpw']
+    connection = pymysql.connect(
+        '192.168.0.28',
+        'gsUser',
+        gsDBpw,
+        'gameScouterDB',
+    )
+    try:
+        dName = str(message.author)
+        with connection:
+            cur = connection.cursor()
+            cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
+            sName = cur.fetchone()[0]
+            print(sName)
+            print("[INFO] Succesfull Database request | Author: {}, SN: {}".format(dName, sName))
+    except Exception as e:
+        print("[ERROR] Database Error: {}".format(e))
+        return "Database Error: {}".format(e)
+
+    return getMatchInfo("ig:{}".format(sName))
+
+
+def getMySummoner(message):
+    print("========================Getting Discord Name Summoner========================")
+    gsDBpw = os.environ['gsDBpw']
+    connection = pymysql.connect(
+        '192.168.0.28',
+        'gsUser',
+        gsDBpw,
+        'gameScouterDB',
+    )
+    try:
+        dName = str(message.author)
+        with connection:
+            cur = connection.cursor()
+            cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
+            sName = cur.fetchone()[0]
+            #print(sName)
+            print("[INFO] Succesfull Database request | Author: {}, SN: {}".format(dName, sName))
+    except Exception as e:
+        print("[ERROR] Database Error: {}".format(e))
+        return "Database Error: {}".format(e)
+
+    return getSummonerInfo("su:{}".format(sName))
+
 
 ##################################################################################################################################
 ##################################################################################################################################
@@ -222,7 +276,7 @@ def getSplashURL(champion):
     return url
 
 def getFooterText(type):
-    text = 'gameScouter V3.0 - Commit 42'
+    text = 'gameScouter V3.2 - Commit 45'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
@@ -360,12 +414,16 @@ def getHelpText():
     embedMessage = discord.Embed(title="Help", color=0x0099ff)
     embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details", inline=False)
     embedMessage.add_field(name="**ig: <Summonername>** ", value="Match Details - lists game details", inline=False)
-    embedMessage.add_field(name="**help:** ", value="You get some info... like this", inline=False)
-    embedMessage.add_field(name="**info:** ", value="Information about the bot", inline=False)
+    embedMessage.add_field(name="**help** ", value="You get some info... like this", inline=False)
+    embedMessage.add_field(name="**info** ", value="Information about the bot", inline=False)
+    embedMessage.add_field(name="**setName: <Summonername>** ", value="Set your summonername", inline=False)
+    embedMessage.add_field(name="**mGame** ", value="gets your game if you set it with setName", inline=False)
+    embedMessage.add_field(name="**mSummoner** ", value="gets your summoner if you set it with setName", inline=False)
+
     return embedMessage
 
 def getInfoText():
-    embedMessage = discord.Embed(title="Help", color=0x0099ff)
+    embedMessage = discord.Embed(title="Info", color=0x0099ff)
     embedMessage.add_field(name="**Creator** ", value="https://github.com/BAAAKA", inline=False)
     embedMessage.add_field(name="**What is this** ", value="Bot that gives you league summoner and match information", inline=False)
     return embedMessage
