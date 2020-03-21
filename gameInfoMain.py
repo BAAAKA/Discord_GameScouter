@@ -256,7 +256,7 @@ def setDB(connection, sName, dName):
             cur = connection.cursor()
             cur.execute("INSERT INTO summoners (sName, dName) VALUES (%s,%s)", (sName, dName))
         connection.commit()
-        print("[INFO] Successfully set Summonername")
+        print("[INFO] Successfully set Summonername: {} | Autor: {}".format(sName, dName))
         return "Success!"
     except Exception as e:
         print("[ERROR] unsuccessful in setting the Summonername!")
