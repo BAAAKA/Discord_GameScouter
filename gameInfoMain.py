@@ -3,7 +3,7 @@ import re
 import discord
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
-from matchData import getNameById, getLocalPIconImage
+from matchData import getNameById, getLocalPIconImage, getLocalSplash_700
 import asyncio
 import time
 import pymysql
@@ -66,15 +66,16 @@ def getSummonerInfo(message):
 
         mostPlayedChamp = getChampionByID(getChampionInformation(),
                                           getSummonerMasteryInfoDetails(masteryInfo, 1)["championId"])
-        embedMessage.set_image(url=getSplashURL(mostPlayedChamp))
-
+        filepath = getLocalSplash_700(mostPlayedChamp)
+        print(filepath)
+        embedMessage.set_image(url="attachment://championImage.png")
 
     else:
         embedMessage.description = "Summoner does not exist"
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
     print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
-    return embedMessage
+    return embedMessage, filepath
 
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")

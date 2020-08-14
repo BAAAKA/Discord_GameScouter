@@ -5,6 +5,7 @@ import os
 imageChampionFolder = "data/img/champion/loading"
 imageRankFolder = r"data/ranked-emblems"
 imageTitlesFolder = r"data/img/champion/tiles"
+imageSplash700Folder = r"data/img/champion/splash_700"
 imageSummonersFolder = r"data/summonerSpells"
 imagePerkFolder = r"data/perks"
 imagePIconFolder = r"data/profileicon"
@@ -12,6 +13,7 @@ imageArenaPath = Path(r"data/img/global/arena.png")
 imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
 imageArenaCleanPath = Path(r"data/img/global/arenaClean.png")
+
 
 summonerSpells = {}
 summonerSpells[1] = "Cleanse"
@@ -91,6 +93,10 @@ def getLocalRankedImage(rank):
 
 def getLocalSummonersImage(summoners):
     path = Path(imageSummonersFolder + "/{}.png".format(summoners))
+    return path
+
+def getLocalSplash_700(champion):
+    path = Path(imageSplash700Folder + "/{}_0.jpg".format(champion))
     return path
 
 def getLocalPerkImage(perkId):
