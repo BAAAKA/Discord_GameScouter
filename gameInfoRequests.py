@@ -2,6 +2,7 @@ import grequests
 
 import requests
 import os
+from urllib.parse import quote
 
 riotApiKey = os.environ['riotAPIKey']
 print("riotAPIKey: {}".format(riotApiKey))
@@ -123,3 +124,15 @@ def getChampionInformation():
     completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/champion.json"
     requestData = requests.get(completedRequestUrl).json()
     return requestData
+
+def getSummonerIconURL(server, summonerName):
+    # print("http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName)))
+    url = "http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName))
+    print("[INFO] AVATAR ICON REQUEST: {}".format(url))
+    return url
+
+def getSummonerIconURL_withID(ID):
+    # print("http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName)))
+    url = "https://cdn.communitydragon.org/latest/profile-icon/{}".format(ID)
+    print("[INFO] AVATAR ICON REQUEST: {}".format(url))
+    return url

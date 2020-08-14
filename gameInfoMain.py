@@ -1,7 +1,6 @@
 import operator
 import re
 import discord
-from urllib.parse import quote
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalPIconImage
@@ -22,8 +21,10 @@ def getSummonerInfo(message):
 
     if getSummonerExistance(summonerInfo):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
-        embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"]))
+        #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
         #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
+        print(summonerInfo["profileIconId"])
+        thumbnailPath = getSummonerIconURL_withID(summonerInfo["profileIconId"])
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -337,13 +338,6 @@ def getChampionByID(championInfo, championID):
             return championNames
     print("[ERROR] Unknown Champion ID: {}".format(championID))
     return "No Champion with ID: {}".format(championID)
-
-
-def getSummonerIconURL(server, summonerName):
-    # print("http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName)))
-    url = "http://avatar.leagueoflegends.com/" + quote("{}/{}.png".format(server, summonerName))
-    return url
-
 
 def getWinrate(queueTypeInfo, queueType):
     totalWins = getSummonerRankInfoDetails(queueTypeInfo, queueType, "wins")
