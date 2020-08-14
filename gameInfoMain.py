@@ -24,7 +24,6 @@ def getSummonerInfo(message):
         #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
         #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
         print(summonerInfo["profileIconId"])
-        thumbnailPath = getSummonerIconURL_withID(summonerInfo["profileIconId"])
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -62,6 +61,8 @@ def getSummonerInfo(message):
         embedMessage.add_field(name="Masteries", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+
+        embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
 
         mostPlayedChamp = getChampionByID(getChampionInformation(),
                                           getSummonerMasteryInfoDetails(masteryInfo, 1)["championId"])
