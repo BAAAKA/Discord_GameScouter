@@ -60,7 +60,7 @@ def getMatchListUrl(id):
 def getMatchListApiInfoArray(accountIdArray):
     urls = []
     for accountId in accountIdArray:
-        print("[INFO] getMatchListApiInfo RequestToAPI - ".format(accountId))
+        print("[INFO] getMatchListApiInfo RequestToAPI - {}".format(accountId))
         url = getMatchListUrl(accountId)
         print("[INFO] REQUESTURL MatchList: " + url)
         urls.append(grequests.get(url))
@@ -120,6 +120,6 @@ def getSummonerMasteryInfo(summonerID):
     return requestData
 
 def getChampionInformation():
-    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/10.4.1/data/en_US/champion.json"
+    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/champion.json"
     requestData = requests.get(completedRequestUrl).json()
     return requestData

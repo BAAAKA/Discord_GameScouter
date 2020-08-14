@@ -10,7 +10,7 @@ def getFontSized(size):
 
 def getMatchImage(matchInfo):
     print("[INFO] getMatchImage!")
-    imageArena = getArenaClean()
+    imageArena = getArena()
     summoners = {}
 
     startPositions = getStartPositions()

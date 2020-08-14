@@ -81,15 +81,6 @@ def getMatchInfo(message):
         summonerName = message.split("ig:", 1)[1]
     else:
         summonerName = message.content.split("ig:", 1)[1]
-    if summonerName == "":
-        gsDBpw = os.environ['gsDBpw']
-        connection = pymysql.connect(
-            '192.168.0.28',
-            'gsUser',
-            gsDBpw,
-            'gameScouterDB',
-        )
-        summonerName = getDB(connection, message.author)
 
     summonerInfo = getSummonerApiInfo(summonerName)
     if getSummonerExistance(summonerInfo):
@@ -108,11 +99,16 @@ def getMatchInfo(message):
                 x+=1
                 summonerIDArray.append(summoner["summonerId"])
             summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
+
+            if os.name == "nt":
+                time.sleep(5) #Delay because of rate limits; For some its way slower in Linux, therefore its only needed in windows
+
             # Async all summonerInfo requests
             summonerNameArray = []
             for summoner in matchInfo["participants"]:
                 summonerNameArray.append(summoner["summonerName"])
             summonerInfos = getSummonerApiInfoArray(summonerNameArray)
+
             # Async all matchListInfo requests
             accountIdArray = []
             for summoner in summonerInfos:
