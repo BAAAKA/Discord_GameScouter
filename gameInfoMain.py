@@ -13,9 +13,9 @@ def getSummonerInfo(message):
     print("========================NEW SUMMONER INFO REQUEST========================")
     start_time = time.time()
     if isinstance(message, str):
-        summonerName = message.split("su:", 1)[1]
+        summonerName = message.split("su: ", 1)[1]
     else:
-        summonerName = message.content.split("su:", 1)[1]
+        summonerName = message.content.split("su: ", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
     embedMessage = discord.Embed(title=summonerName, color=0x0099ff)
 
@@ -23,7 +23,19 @@ def getSummonerInfo(message):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
         #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
         #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
-        print(summonerInfo["profileIconId"])
+        matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
+        championCount = getChampionPlayCount(matchListInfo)
+        championInfo = getChampionInformation()
+        mostPlayedChamp = []
+        for i in range(3):
+            mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
+            championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
+            mostPlayedChamp[i].append(championName)
+            del championCount[mostPlayedChamp[i][0]]
+        print(mostPlayedChamp[0][2])
+        print(mostPlayedChamp[1])
+        print(mostPlayedChamp[2])
+
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -64,10 +76,7 @@ def getSummonerInfo(message):
 
         embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
 
-        mostPlayedChamp = getChampionByID(getChampionInformation(),
-                                          getSummonerMasteryInfoDetails(masteryInfo, 1)["championId"])
-        filepath = getLocalSplash_700(mostPlayedChamp)
-        print(filepath)
+        filepath = getLocalSplash_700(mostPlayedChamp[0][2])
         embedMessage.set_image(url="attachment://championImage.png")
 
     else:
@@ -275,7 +284,7 @@ def getSplashURL(champion):
     return url
 
 def getFooterText(type):
-    text = 'gameScouter V3.2 - Commit 45'
+    text = 'gameScouter V3.4 - C 50'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text

@@ -92,7 +92,7 @@ def getSummonerRankApiInfo(summonerID):
 
 def getMatchListApiInfo(accountId):
     print("[INFO] getMatchListApiInfo RequestToAPI - " + accountId)
-    completedRequestUrl = getMatchListUrl(id)
+    completedRequestUrl = getMatchListUrl(accountId)
     print("[INFO] REQUESTURL MatchList: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     #print("[INFO] MatchList: {}".format(requestData))

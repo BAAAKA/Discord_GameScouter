@@ -28,7 +28,7 @@ activity = discord.Game(name="doing something", type=3)
 @client.event
 async def on_ready():
     activity = discord.Game(name="catch with wolf!", type=3)
-    await client.change_presence(status=discord.Status.idle, activity=activity)
+    await client.change_presence(status=discord.Status.online, activity=activity)
     print("[INFO] leagueScouter is ready!")
 
 @client.event
