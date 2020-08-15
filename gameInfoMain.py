@@ -24,6 +24,7 @@ def getSummonerInfo(message):
         #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
         #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
         matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
+        print(matchListInfo)
         championCount = getChampionPlayCount(matchListInfo)
         championInfo = getChampionInformation()
         mostPlayedChamp = []
@@ -32,9 +33,6 @@ def getSummonerInfo(message):
             championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
             mostPlayedChamp[i].append(championName)
             del championCount[mostPlayedChamp[i][0]]
-        print(mostPlayedChamp[0][2])
-        print(mostPlayedChamp[1])
-        print(mostPlayedChamp[2])
 
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
@@ -43,24 +41,24 @@ def getSummonerInfo(message):
             if not re.search("SUMMONER HAS NO RANK*", soloQRank):
                 embedMessage.add_field(name=":beginner: SoloQ Rank ",
                                        value=getRankAndLP(queueTypeInfo, "RANKED_SOLO_5x5"), inline=False)
-                embedMessage.add_field(name="wins ",
+                embedMessage.add_field(name="Wins ",
                                        value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "wins"),
                                        inline=True)
-                embedMessage.add_field(name="losses ",
+                embedMessage.add_field(name="Losses ",
                                        value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "losses"),
                                        inline=True)
-                embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_SOLO_5x5") + "%",
+                embedMessage.add_field(name="Winrate ", value=getWinrate(queueTypeInfo, "RANKED_SOLO_5x5") + "%",
                                        inline=True)
             if not re.search("SUMMONER HAS NO RANK*", flexQRank):
                 embedMessage.add_field(name=":beginner: FlexQ Rank ",
                                        value=getRankAndLP(queueTypeInfo, "RANKED_FLEX_SR"), inline=False)
-                embedMessage.add_field(name="wins ",
+                embedMessage.add_field(name="Wins ",
                                        value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "wins"),
                                        inline=True)
-                embedMessage.add_field(name="losses ",
+                embedMessage.add_field(name="Losses ",
                                        value=getSummonerRankInfoDetails(queueTypeInfo, "RANKED_FLEX_SR", "losses"),
                                        inline=True)
-                embedMessage.add_field(name="winrate ", value=getWinrate(queueTypeInfo, "RANKED_FLEX_SR") + "%",
+                embedMessage.add_field(name="Winrate ", value=getWinrate(queueTypeInfo, "RANKED_FLEX_SR") + "%",
                                        inline=True)
 
         masteryInfo = getSummonerMasteryInfo(summonerInfo["id"])
@@ -69,10 +67,20 @@ def getSummonerInfo(message):
         MID1 = getSummonerMasteryInfoDetails(masteryInfo, 1)
         MID2 = getSummonerMasteryInfoDetails(masteryInfo, 2)
         MID3 = getSummonerMasteryInfoDetails(masteryInfo, 3)
+        print(getMasteryChampion(MID1, MID2, MID3))
+        print((mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2]))
+        print([mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2]])
 
         embedMessage.add_field(name="Masteries", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
         embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+
+        #Most Played Champs
+        champNames = getMostPlayedText(mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2])
+        champPlayedAmount = "{}\n{}\n{}".format(mostPlayedChamp[0][1], mostPlayedChamp[1][1], mostPlayedChamp[2][1])
+
+        embedMessage.add_field(name="Most Played", value=champNames, inline=True)
+        embedMessage.add_field(name="Last 100 games", value=champPlayedAmount, inline=True)
 
         embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
 
@@ -80,7 +88,7 @@ def getSummonerInfo(message):
         embedMessage.set_image(url="attachment://championImage.png")
 
     else:
-        embedMessage.description = "Summoner does not exist"
+        return "Summoner does not exist"
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
     print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
@@ -328,6 +336,8 @@ def getMasteryChampion(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDeta
     mostPlayedChamp3 = getChampionByID(getChampionInformation(), MasteryInfoDetails3["championId"])
     return ":small_orange_diamond: " + mostPlayedChamp1 + "\n:small_orange_diamond: " + mostPlayedChamp2 + "\n:small_orange_diamond: " + mostPlayedChamp3
 
+def getMostPlayedText(c1, c2, c3): #Return text for SU: most played champ
+    return ":fleur_de_lis: " + c1 + "\n:fleur_de_lis: " + c2 + "\n:fleur_de_lis: " + c3
 
 def getMasteryLevel(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
     mostPlayedChampLevel1 = str(MasteryInfoDetails1["championLevel"])
