@@ -23,16 +23,6 @@ def getSummonerInfo(message):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
         #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
         #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
-        matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
-        print(matchListInfo)
-        championCount = getChampionPlayCount(matchListInfo)
-        championInfo = getChampionInformation()
-        mostPlayedChamp = []
-        for i in range(3):
-            mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
-            championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
-            mostPlayedChamp[i].append(championName)
-            del championCount[mostPlayedChamp[i][0]]
 
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
@@ -62,31 +52,43 @@ def getSummonerInfo(message):
                                        inline=True)
 
         masteryInfo = getSummonerMasteryInfo(summonerInfo["id"])
-
         # MASTERINFODETAILS
-        MID1 = getSummonerMasteryInfoDetails(masteryInfo, 1)
-        MID2 = getSummonerMasteryInfoDetails(masteryInfo, 2)
-        MID3 = getSummonerMasteryInfoDetails(masteryInfo, 3)
-        print(getMasteryChampion(MID1, MID2, MID3))
-        print((mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2]))
-        print([mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2]])
+        if not (masteryInfo == []):
+            print("[INFO] Summoner has mastery")
+            MID1 = getSummonerMasteryInfoDetails(masteryInfo, 1)
+            MID2 = getSummonerMasteryInfoDetails(masteryInfo, 2)
+            MID3 = getSummonerMasteryInfoDetails(masteryInfo, 3)
 
-        embedMessage.add_field(name="Masteries", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
-        embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
-        embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+            embedMessage.add_field(name="Masteries", value=getMasteryChampion(MID1, MID2, MID3), inline=True)
+            embedMessage.add_field(name="_", value=getMasteryLevel(MID1, MID2, MID3), inline=True)
+            embedMessage.add_field(name="_", value=getMasteryPoints(MID1, MID2, MID3), inline=True)
+        else:
+            print("[INFO] Summoner has no mastery!")
 
         #Most Played Champs
-        champNames = getMostPlayedText(mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2])
-        champPlayedAmount = "{}\n{}\n{}".format(mostPlayedChamp[0][1], mostPlayedChamp[1][1], mostPlayedChamp[2][1])
+        matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
+        print(matchListInfo)
+        if "status" not in matchListInfo: #If status key exists in the matchListInfo directory its probably a 404, does not exist
+            championCount = getChampionPlayCount(matchListInfo)
+            championInfo = getChampionInformation()
+            mostPlayedChamp = []
+            for i in range(3):
+                mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
+                championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
+                mostPlayedChamp[i].append(championName)
+                del championCount[mostPlayedChamp[i][0]]
 
-        embedMessage.add_field(name="Most Played", value=champNames, inline=True)
-        embedMessage.add_field(name="Last 100 games", value=champPlayedAmount, inline=True)
+            champNames = getMostPlayedText(mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2])
+            champPlayedAmount = "{}x\n{}x\n{}x".format(mostPlayedChamp[0][1], mostPlayedChamp[1][1], mostPlayedChamp[2][1])
 
-        embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
+            embedMessage.add_field(name="Most played recently", value=champNames, inline=True)
+            embedMessage.add_field(name="Last 100 games", value=champPlayedAmount, inline=True)
 
-        filepath = getLocalSplash_700(mostPlayedChamp[0][2])
+            embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
+            filepath = getLocalSplash_700(mostPlayedChamp[0][2])
+        else:
+            filepath = getLocalSplash_700("Kindred")
         embedMessage.set_image(url="attachment://championImage.png")
-
     else:
         return "Summoner does not exist"
 
@@ -292,7 +294,7 @@ def getSplashURL(champion):
     return url
 
 def getFooterText(type):
-    text = 'gameScouter V3.4 - C 50'
+    text = 'gameScouter V3.7 - C 52'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
