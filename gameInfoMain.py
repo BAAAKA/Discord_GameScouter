@@ -103,6 +103,7 @@ def getMatchInfo(message):
     if getSummonerExistance(summonerInfo):
         matchInfo = getMatchApiInfo(summonerInfo["id"])
         if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
+            print("[INFO] Summoner is not ingame right now - done")
             returnText = "This summoner is not ingame right now..."
         else:
             # here you know that the summoner exists and is ingame
@@ -190,7 +191,7 @@ def getMatchInfo(message):
 
             embedMessage = discord.Embed(color=0x0099ff)
             embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
-            embedMessage.set_image(url="attachment://matchImage.png")
+            embedMessage.set_image(url="attachment://matchImage.jpg")
             returnText = embedMessage, filePath
     else:
         returnText = "Summoner does not exist!"
@@ -406,7 +407,6 @@ def getLanePlayCount(matchListInfo):
             laneCount[lane] = 0
         laneCount[lane] += 1
     return laneCount
-
 
 def getChampionPlayCount(matchListInfo):
     championCount = {}
