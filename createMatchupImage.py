@@ -115,9 +115,10 @@ def getMatchImage(matchInfo):
 
 
     #END
-    filename = time.strftime("MATCH%Y%m%d-%H%M%S.png")
+    filename = time.strftime("MATCH%Y%m%d-%H%M%S.jpg")
     filePath = "temp/{}".format(filename)
-    imageArena.save(filePath)
+    imageArena_jpg = imageArena.convert('RGB')
+    imageArena_jpg.save(filePath)
     print("[INFO] Done with match Image!")
     return filePath
 

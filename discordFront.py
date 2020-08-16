@@ -55,7 +55,7 @@ async def on_message(message):
                 await message.channel.send(returnText)
                 await loadingMessageFetched.delete()
                 return
-            image = discord.File(returnText[1], filename="matchImage.png")
+            image = discord.File(returnText[1], filename="matchImage.jpg")
             await message.channel.send(file=image, embed=returnText[0])
             await loadingMessageFetched.delete()
 
