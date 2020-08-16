@@ -83,10 +83,6 @@ def getLocalTitlesImage(champion):
     path = Path(imageTitlesFolder + "/{}_0.jpg".format(champion))
     return path
 
-def getLocalPIconImage(icon):
-    path = Path(imagePIconFolder + "/{}.png".format(icon))
-    return path
-
 def getLocalRankedImage(rank):
     path = Path(imageRankFolder + "/Emblem_{}.png".format(rank))
     return path

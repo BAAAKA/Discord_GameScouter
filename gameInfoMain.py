@@ -3,8 +3,7 @@ import re
 import discord
 from gameInfoRequests import *
 from createMatchupImage import getMatchImage
-from matchData import getNameById, getLocalPIconImage, getLocalSplash_700
-import asyncio
+from matchData import getNameById, getLocalSplash_700
 import time
 import pymysql
 
@@ -17,13 +16,10 @@ def getSummonerInfo(message):
     else:
         summonerName = message.content.split("su: ", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
-    embedMessage = discord.Embed(title=summonerName, color=0x0099ff)
+    embedMessage = discord.Embed(title=summonerInfo["name"], color=0x0099ff)
 
     if getSummonerExistance(summonerInfo):
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
-        #embedMessage.set_thumbnail(url=getSummonerIconURL("euw", summonerInfo["name"])) #http://avatar.leagueoflegends.com seems to be broken
-        #thumbnailPath = getLocalPIconImage(summonerInfo["profileIconId"])
-
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
             soloQRank = getSummonerRankInfoDetails(queueTypeInfo, "RANKED_SOLO_5x5", "rank")
@@ -67,7 +63,6 @@ def getSummonerInfo(message):
 
         #Most Played Champs
         matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
-        print(matchListInfo)
         if "status" not in matchListInfo: #If status key exists in the matchListInfo directory its probably a 404, does not exist
             championCount = getChampionPlayCount(matchListInfo)
             championInfo = getChampionInformation()
