@@ -262,13 +262,20 @@ def setLaneByChamp(summoners):
     for champ in rawChampData:
         champData[champ[0]] = [champ[1], champ[2]]
 
-    lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
+    lanes = ["Jungle", "Top", "Middle", "Support", "ADC"]
 
-    maxLoop = 100
+    maxLoop = 30
     r = 0
     teamId = 100
     while lanes and maxLoop > r:
         success = False
+        for summoner in summoners:
+            if not "lane" in summoner and summoner["teamId"] == teamId and "Jungle" in lanes:
+                if getNameById(summoner["spell1Id"]) == "Smite" or getNameById(summoner["spell2Id"]) == "Smite":
+                    print("[INFO] Found the jungler with Smite! <{}> is playing <{}> in the Jungle with smite".format(summoner["summonerName"],summoner["champion"]))
+                    lanes.remove("Jungle")
+                    summoner["lane"] = "Jungle"
+
         lane = lanes[0]
         print("[INFO] looking for play in the lane: {}".format(lane))
         for summoner in summoners:
@@ -318,7 +325,7 @@ def setLaneByChamp(summoners):
                     break
             if teamId == 200:
                 print("[INFO] All Player of the first team have a lane - TEAM SWITCH!")
-                lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
+                lanes = ["Jungle", "Top", "Middle", "Support", "ADC"]
     return summoners
 
 def readTextfile(filename):
