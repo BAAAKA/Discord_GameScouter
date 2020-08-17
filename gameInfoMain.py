@@ -176,12 +176,9 @@ def getMatchInfo(message):
                     del championCount[mostPlayedChamp[i][0]]
                 summoner["mostPlayedChamps"] = mostPlayedChamp
 
-                # Lane in this match
-                if not lanes:
-                    lanes = ["Top", "Mid", "Support", "ADC", "Jungle"]
-                lane = getLane(summoner["spell1Id"], summoner["spell2Id"], lanes, summoner["mostPlayedLanes"])
-                lanes.remove(lane)
-                summoner["lane"] = lane
+
+            # Lane in this match
+            matchInfo["participants"] = setLaneByChamp(matchInfo["participants"])
 
             print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
             start_timeImage = time.time()
@@ -235,7 +232,6 @@ def getMyGame(message):
 
     return getMatchInfo("ig:{}".format(sName))
 
-
 def getMySummoner(message):
     print("========================Getting Discord Name Summoner========================")
     gsDBpw = os.environ['gsDBpw']
@@ -259,10 +255,81 @@ def getMySummoner(message):
 
     return getSummonerInfo("su:{}".format(sName))
 
+def setLaneByChamp(summoners):
+    rawChampData = readTextfile("champToLane.txt")
 
-##################################################################################################################################
-##################################################################################################################################
-##################################################################################################################################
+    champData = {}
+    for champ in rawChampData:
+        champData[champ[0]] = [champ[1], champ[2]]
+    print(champData)
+
+    lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
+
+    maxLoop = 100
+    r = 0
+    teamId = 100
+    while lanes and maxLoop > r:
+        success = False
+        lane = lanes[0]
+        print("Lane: {}".format(lane))
+        for summoner in summoners:
+            if not "lane" in summoner and summoner["teamId"] == teamId:
+                champ = summoner["champion"]
+                print("summoner {} is playing {} and is searching for Lane {}".format(summoner["summonerName"],
+                                                                                      summoner["champion"],
+                                                                                      champData[champ][0]))
+                if (champData[champ][0] == lane):
+                    print("[CORRECT LANE] player {} is playing {} on the lane {}".format(summoner["summonerName"],
+                                                                                         summoner["champion"], lane))
+                    success = True
+                    lanes.remove(lane)
+                    summoner["lane"] = lane
+                    break
+        if not success:
+            print("[2nd] Looking for Second Choices!")
+            for summoner in summoners:
+                if not "lane" in summoner and summoner["teamId"] == teamId:
+                    champ = summoner["champion"]
+                    print("summoner {} is playing {} and is searching for Lane {}".format(summoner["summonerName"],
+                                                                                          summoner["champion"],
+                                                                                          champData[champ][1]))
+                    if (champData[champ][1] == lane):
+                        print("[CORRECT LANE] player {} is playing {} on the lane {}".format(summoner["summonerName"],
+                                                                                             summoner["champion"],
+                                                                                             lane))
+                        success = True
+                        lanes.remove(lane)
+                        summoner["lane"] = lane
+                        break
+        if not success:
+            for summoner in summoners:
+                if not "lane" in summoner and summoner["teamId"] == teamId:
+                    print(
+                        "SET LANE player {} is playing {} on the lane {}".format(summoner["summonerName"], summoner["champion"],
+                                                                                 lane))
+                    lanes.remove(lane)
+                    summoner["lane"] = lane
+                    break
+        r += 1
+        if teamId == 100:
+            teamId = 200
+            for summoner in summoners:
+                if summoner["teamId"] == 100 and "lane" not in summoner:
+                    teamId = 100
+                    break
+            if teamId == 200:
+                print("TEAM SWITCH")
+                lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
+    return summoners
+
+def readTextfile(filename):
+    text_file = open(filename, "r")
+    lines = text_file.read().split('\n')
+    content = []
+    for line in lines:
+        content.append(line.split(","))
+    print("[INFO] Succesfully read the textfile {}".format(filename))
+    return content
 
 def setDB(connection, sName, dName):
     try:

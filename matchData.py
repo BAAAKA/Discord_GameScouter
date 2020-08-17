@@ -256,7 +256,7 @@ yStartTeam2 = 1245
 startPositions = {}
 startPositions["Top"] = 0
 startPositions["Jungle"] = 500
-startPositions["Mid"] = 1000
+startPositions["Middle"] = 1000
 startPositions["ADC"] = 1500
 startPositions["Support"] = 2000
 
