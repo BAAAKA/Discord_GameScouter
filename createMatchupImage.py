@@ -69,7 +69,7 @@ def getMatchImage(matchInfo):
 
         # Perkz
         prekId = summoners[summonerNr]["perks"]["perkIds"][0]
-        print("{}: {}".format(summoners[summonerNr]["summonerName"], prekId))
+        #print("{}: {}".format(summoners[summonerNr]["summonerName"], prekId))
         image=summoners[summonerNr]["perkImage"]
         imageEdited = image.resize((64,64))
         imageArena.paste(imageEdited, getAreaOfCustom(x+128, y + 400, 64), mask=imageEdited)

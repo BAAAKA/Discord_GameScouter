@@ -177,7 +177,7 @@ def getMatchInfo(message):
                 summoner["mostPlayedChamps"] = mostPlayedChamp
 
 
-            # Lane in this match
+            # Lane allocation
             matchInfo["participants"] = setLaneByChamp(matchInfo["participants"])
 
             print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
@@ -256,12 +256,11 @@ def getMySummoner(message):
     return getSummonerInfo("su:{}".format(sName))
 
 def setLaneByChamp(summoners):
+    print("[INFO] ====Beginning Lane Allocation====")
     rawChampData = readTextfile("champToLane.txt")
-
     champData = {}
     for champ in rawChampData:
         champData[champ[0]] = [champ[1], champ[2]]
-    print(champData)
 
     lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
 
@@ -271,30 +270,30 @@ def setLaneByChamp(summoners):
     while lanes and maxLoop > r:
         success = False
         lane = lanes[0]
-        print("Lane: {}".format(lane))
+        print("[INFO] looking for play in the lane: {}".format(lane))
         for summoner in summoners:
             if not "lane" in summoner and summoner["teamId"] == teamId:
                 champ = summoner["champion"]
-                print("summoner {} is playing {} and is searching for Lane {}".format(summoner["summonerName"],
+                print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
                                                                                       summoner["champion"],
                                                                                       champData[champ][0]))
                 if (champData[champ][0] == lane):
-                    print("[CORRECT LANE] player {} is playing {} on the lane {}".format(summoner["summonerName"],
+                    print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
                                                                                          summoner["champion"], lane))
                     success = True
                     lanes.remove(lane)
                     summoner["lane"] = lane
                     break
         if not success:
-            print("[2nd] Looking for Second Choices!")
+            print("[INFO] Couldnt find any primary position, looking for a secondary position!")
             for summoner in summoners:
                 if not "lane" in summoner and summoner["teamId"] == teamId:
                     champ = summoner["champion"]
-                    print("summoner {} is playing {} and is searching for Lane {}".format(summoner["summonerName"],
+                    print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
                                                                                           summoner["champion"],
                                                                                           champData[champ][1]))
                     if (champData[champ][1] == lane):
-                        print("[CORRECT LANE] player {} is playing {} on the lane {}".format(summoner["summonerName"],
+                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
                                                                                              summoner["champion"],
                                                                                              lane))
                         success = True
@@ -305,7 +304,7 @@ def setLaneByChamp(summoners):
             for summoner in summoners:
                 if not "lane" in summoner and summoner["teamId"] == teamId:
                     print(
-                        "SET LANE player {} is playing {} on the lane {}".format(summoner["summonerName"], summoner["champion"],
+                        "[INFO] [FAIL] Couldnt find Lane - Player <{}> is now playing <{}> on the lane <{}>".format(summoner["summonerName"], summoner["champion"],
                                                                                  lane))
                     lanes.remove(lane)
                     summoner["lane"] = lane
@@ -318,7 +317,7 @@ def setLaneByChamp(summoners):
                     teamId = 100
                     break
             if teamId == 200:
-                print("TEAM SWITCH")
+                print("[INFO] All Player of the first team have a lane - TEAM SWITCH!")
                 lanes = ["Top", "Middle", "Support", "ADC", "Jungle"]
     return summoners
 
