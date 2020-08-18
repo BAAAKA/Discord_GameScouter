@@ -7,8 +7,8 @@ Discord Bot, gets League of Legends summoner and match information and displays 
 
 
 ### How it looks in discord - Match
-![screenshot of the bot in discord](https://github.com/BAAAKA/Discord_GameScouter/blob/masterimages//gameImage.PNG)
+![screenshot of the bot in discord](https://github.com/BAAAKA/Discord_GameScouter/blob/master/images/gameImage.PNG)
 
 
 ### Match Image
-![match image](https://github.com/BAAAKA/Discord_GameScouter/blob/masterimages//matchImage.png)
+![match image](https://github.com/BAAAKA/Discord_GameScouter/blob/master/images/matchImage.png)
