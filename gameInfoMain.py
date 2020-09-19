@@ -83,7 +83,7 @@ def getSummonerInfo(message):
             filepath = getLocalSplash_700(mostPlayedChamp[0][2])
         else:
             filepath = getLocalSplash_700("Kindred")
-        embedMessage.set_image(url="attachment://championImage.png")
+        embedMessage.set_image(url="attachment://championImage.jpg")
     else:
         return "Summoner does not exist"
 
