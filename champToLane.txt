@@ -147,3 +147,4 @@ Zed,Middle,NoLane
 Ziggs,Middle,ADC
 Zilean,Support,Middle
 Zoe,Middle,Support
+Zyra,Support,NoLane
