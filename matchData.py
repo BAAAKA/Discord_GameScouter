@@ -59,7 +59,6 @@ else:
     print("[INFO] LINUX FONT")
     fontPath = r"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
-
 def getFont():
     return fontPath
 
@@ -81,7 +80,11 @@ def getLocalLoadingImage(champion):
 
 def getLocalTitlesImage(champion):
     path = Path(imageTitlesFolder + "/{}_0.jpg".format(champion))
-    return path
+    if os.path.isfile(path):
+        return path
+    else: #If Champion doesnt exist
+        defaultTitlesPath = Path(imageTitlesFolder + "/{}.jpg".format("default"))
+        return defaultTitlesPath
 
 def getLocalRankedImage(rank):
     path = Path(imageRankFolder + "/Emblem_{}.png".format(rank))
@@ -93,7 +96,11 @@ def getLocalSummonersImage(summoners):
 
 def getLocalSplash_700(champion):
     path = Path(imageSplash700Folder + "/{}_0.jpg".format(champion))
-    return path
+    if os.path.isfile(path):
+        return path
+    else: #If Champion doesnt exist
+        defaultTitlesPath = Path(imageTitlesFolder + "/{}.jpg".format("default"))
+        return defaultTitlesPath
 
 def getLocalPerkImage(perkId):
     try:

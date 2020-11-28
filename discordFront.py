@@ -45,7 +45,7 @@ async def on_message(message):
             if isinstance(returnText, str):
                 await message.channel.send(returnText)
                 return
-            image = discord.File(returnText[1], filename="championImage.png")
+            image = discord.File(returnText[1], filename="championImage.jpg")
             await message.channel.send(file=image, embed=returnText[0])
 
         if "ig:" in message.content.lower():

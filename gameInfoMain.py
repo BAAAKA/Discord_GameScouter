@@ -281,16 +281,24 @@ def setLaneByChamp(summoners):
         for summoner in summoners:
             if not "lane" in summoner and summoner["teamId"] == teamId:
                 champ = summoner["champion"]
-                print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
-                                                                                      summoner["champion"],
-                                                                                      champData[champ][0]))
-                if (champData[champ][0] == lane):
-                    print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
-                                                                                         summoner["champion"], lane))
+                try:
+                    print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
+                                                                                          summoner["champion"],
+                                                                                          champData[champ][0]))
+                    if (champData[champ][0] == lane):
+                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
+                                                                                             summoner["champion"], lane))
+                        success = True
+                        lanes.remove(lane)
+                        summoner["lane"] = lane
+                        break
+                except:
+                    print("[ERROR] I HAVE NOT SEEN THIS CHAMPION BEFORE")
                     success = True
                     lanes.remove(lane)
                     summoner["lane"] = lane
                     break
+
         if not success:
             print("[INFO] Couldnt find any primary position, looking for a secondary position!")
             for summoner in summoners:
