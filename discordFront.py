@@ -1,26 +1,12 @@
 import discord
-from dotenv import load_dotenv
 import os
-from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText, setSummonername, getMyGame, getMySummoner
+from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
 
-iboisChannelID = 594973116019638515
-botTestingID = 649304929613250560
-myServerID = 682327435370430567
-DnDServer = 687363534740258849
-
-channelID = []
-if os.name == "nt":
-    channelID.append(botTestingID)
-else:
-    channelID.append(iboisChannelID)
-    channelID.append(myServerID)
-    channelID.append(DnDServer)
 
 # GetToken
-token = os.environ['discordToken']
+token = os.environ['discordTokenTest']
 print("Token: {}".format(token))
 
-load_dotenv()
 client = discord.Client()
 
 activity = discord.Game(name="doing something", type=3)
@@ -33,69 +19,33 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.channel.id in channelID:
-        if message.author == client.user:
-            return
-
-        if "lol:" == message.content.lower():
-            await message.channel.send('rito sux')
-
-        if "su:" in message.content.lower():
-            returnText = getSummonerInfo(message)
-            if isinstance(returnText, str):
-                await message.channel.send(returnText)
-                return
-            image = discord.File(returnText[1], filename="championImage.jpg")
-            await message.channel.send(file=image, embed=returnText[0])
-
-        if "ig:" in message.content.lower():
-            loadingMessage = await message.channel.send("processing your request...")
-            loadingMessageFetched = await message.channel.fetch_message(loadingMessage.id)
-            returnText = getMatchInfo(message)
-            if isinstance(returnText, str):
-                await message.channel.send(returnText)
-                await loadingMessageFetched.delete()
-                return
-            image = discord.File(returnText[1], filename="matchImage.jpg")
-            await message.channel.send(file=image, embed=returnText[0])
-            await loadingMessageFetched.delete()
-
-        if "setname:" in message.content.lower():
-            returnText = setSummonername(message)
+    if message.author == client.user:
+        return
+    if message.content.lower().startswith("su:"):
+        returnText = getSummonerInfo(message)
+        if isinstance(returnText, str):
             await message.channel.send(returnText)
+            return
+        image = discord.File(returnText[1], filename="championImage.jpg")
+        await message.channel.send(file=image, embed=returnText[0])
 
-        if "help" == message.content.lower():
-            await message.channel.send(embed=getHelpText())
-
-        if "info" == message.content.lower():
-            await message.channel.send(embed=getInfoText())
-
-        if "test:" in message.content.lower():
-            await message.channel.send(embed="")
-
-        if "mgame" in message.content.lower():
-            loadingMessage = await message.channel.send("processing your request...")
-            loadingMessageFetched = await message.channel.fetch_message(loadingMessage.id)
-            returnText = getMyGame(message)
-            if isinstance(returnText, str):
-                await message.channel.send(returnText)
-                await loadingMessageFetched.delete()
-                return
-            image = discord.File(returnText[1], filename="matchImage.jpg")
-            await message.channel.send(file=image, embed=returnText[0])
+    if message.content.lower().startswith("game:"):
+        loadingMessage = await message.channel.send("processing your request...")
+        loadingMessageFetched = await message.channel.fetch_message(loadingMessage.id)
+        returnText = getMatchInfo(message)
+        if isinstance(returnText, str):
+            await message.channel.send(returnText)
             await loadingMessageFetched.delete()
+            return
+        image = discord.File(returnText[1], filename="matchImage.jpg")
+        await message.channel.send(file=image, embed=returnText[0])
+        await loadingMessageFetched.delete()
 
+    if "help" == message.content.lower():
+        await message.channel.send(embed=getHelpText())
 
-        if "msum" in message.content.lower() or "macc" in message.content.lower():
-            returnText = getMySummoner(message)
-            if isinstance(returnText, str):
-                await message.channel.send(returnText)
-                return
-            await message.channel.send(embed=returnText)
-
-        if "windows" == message.content.lower():
-            await message.channel.send('LINUX!')
-
+    if "info" == message.content.lower():
+        await message.channel.send(embed=getInfoText())
 
 client.run(token)
 

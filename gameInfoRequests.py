@@ -75,7 +75,8 @@ def getSummonerApiInfo(summonerName):
     requestData = requests.get(completedRequestUrl).json()
     try:
         if requestData["status"]["status_code"] == 404:
-            requestData = "NO SUMMONER FOUND"
+            print("[INFO][getSummonerApiInfo] NO SUMMONER FOUND WITH NAME: {}".format(summonerName))
+            return False
     except:
         pass
     print("[INFO] SUMMONERDATA: {}".format(requestData))

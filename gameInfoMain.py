@@ -16,9 +16,9 @@ def getSummonerInfo(message):
     else:
         summonerName = message.content.split("su: ", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
-    embedMessage = discord.Embed(title=summonerInfo["name"], color=0x0099ff)
 
-    if getSummonerExistance(summonerInfo):
+    if summonerInfo:
+        embedMessage = discord.Embed(title=summonerInfo["name"], color=0x0099ff)
         embedMessage.description = "Level {}".format(summonerInfo["summonerLevel"])
         queueTypeInfo = getSummonerRankApiInfo(summonerInfo["id"])
         if queueTypeInfo:
@@ -95,12 +95,12 @@ def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
     start_time = time.time()
     if isinstance(message, str):
-        summonerName = message.split("ig:", 1)[1]
+        summonerName = message.split("game:", 1)[1]
     else:
-        summonerName = message.content.split("ig:", 1)[1]
+        summonerName = message.content.split("game:", 1)[1]
 
     summonerInfo = getSummonerApiInfo(summonerName)
-    if getSummonerExistance(summonerInfo):
+    if summonerInfo:
         matchInfo = getMatchApiInfo(summonerInfo["id"])
         if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
             print("[INFO] Summoner is not ingame right now - done")
@@ -194,67 +194,6 @@ def getMatchInfo(message):
         returnText = "Summoner does not exist!"
     return returnText
 
-def setSummonername(message):
-    print("========================Setting Summonername========================")
-    gsDBpw = os.environ['gsDBpw']
-    connection = pymysql.connect(
-        '192.168.0.28',
-        'gsUser',
-        gsDBpw,
-        'gameScouterDB',
-    )
-    summonerName = message.content.split("setname:", 1)[1]
-    sName = str(summonerName)
-    dName = str(message.author)
-    result = setDB(connection, sName, dName)
-    return result
-
-def getMyGame(message):
-    print("========================Getting Discord Name Game========================")
-    gsDBpw = os.environ['gsDBpw']
-    connection = pymysql.connect(
-        '192.168.0.28',
-        'gsUser',
-        gsDBpw,
-        'gameScouterDB',
-    )
-    try:
-        dName = str(message.author)
-        with connection:
-            cur = connection.cursor()
-            cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
-            sName = cur.fetchone()[0]
-            print(sName)
-            print("[INFO] Succesfull Database request | Author: {}, SN: {}".format(dName, sName))
-    except Exception as e:
-        print("[ERROR] Database Error: {}".format(e))
-        return "Database Error: {}".format(e)
-
-    return getMatchInfo("ig:{}".format(sName))
-
-def getMySummoner(message):
-    print("========================Getting Discord Name Summoner========================")
-    gsDBpw = os.environ['gsDBpw']
-    connection = pymysql.connect(
-        '192.168.0.28',
-        'gsUser',
-        gsDBpw,
-        'gameScouterDB',
-    )
-    try:
-        dName = str(message.author)
-        with connection:
-            cur = connection.cursor()
-            cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
-            sName = cur.fetchone()[0]
-            #print(sName)
-            print("[INFO] Succesfull Database request | Author: {}, SN: {}".format(dName, sName))
-    except Exception as e:
-        print("[ERROR] Database Error: {}".format(e))
-        return "Database Error: {}".format(e)
-
-    return getSummonerInfo("su:{}".format(sName))
-
 def setLaneByChamp(summoners):
     print("[INFO] ====Beginning Lane Allocation====")
     rawChampData = readTextfile("champToLane.txt")
@@ -345,27 +284,6 @@ def readTextfile(filename):
     print("[INFO] Succesfully read the textfile {}".format(filename))
     return content
 
-def setDB(connection, sName, dName):
-    try:
-        with connection:
-            cur = connection.cursor()
-            cur.execute("INSERT INTO summoners (sName, dName) VALUES (%s,%s)", (sName, dName))
-        connection.commit()
-        print("[INFO] Successfully set Summonername: {} | Autor: {}".format(sName, dName))
-        return "Success!"
-    except Exception as e:
-        print("[ERROR] unsuccessful in setting the Summonername!")
-        print("[ERROR] Message: {}".format(e))
-        return "unsuccessful"
-
-def getDB(connection, dName):
-    with connection:
-        cur = connection.cursor()
-        cur.execute("SELECT sName FROM summoners where dName = '{}' limit 1".format(dName))
-        sName = cur.fetchone()[0]
-        print("[INFO] Successfully got Summonername: {}".format(sName))
-        return sName
-
 def getSplashURL(champion):
     url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
     return url
@@ -453,14 +371,6 @@ def getRankAndLP(queueTypeInfo, queueType):
     lp = str(getSummonerRankInfoDetails(queueTypeInfo, queueType, "leaguePoints"))
     returnText = tier + " " + rank + " - " + lp + " LP"
     return returnText
-
-
-def getSummonerExistance(summonerInfo):
-    if summonerInfo == "NO SUMMONER FOUND":
-        return False
-    else:
-        return True
-
 
 def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
     for qType in queueTypeInfo:  # TEST IF SUMMONER HAS THIS QUEUETYPE RANK
