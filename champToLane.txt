@@ -98,7 +98,9 @@ Riven,Top,NoLane
 Rumble,Top,Middle
 Ryze,Middle,Top
 Sejuani,Jungle,NoLane
+Seraphine,Support,Middle
 Senna,Support,ADC
+Samira,ADC,NoLane
 Sett,Jungle,Top
 Shaco,Jungle,Support
 Shen,Top,Support

@@ -107,10 +107,9 @@ def getMatchApiInfo(summonerID):
     requestData = requests.get(completedRequestUrl).json()
     try:
         if requestData["status"]["status_code"] == 404:
-            requestData = "SUMMONER IS NOT INGAME"
+            return False
     except:
         pass
-    #print("[INFO] MATCHDATA: {}".format(requestData))
     return requestData
 
 def getSummonerMasteryInfo(summonerID):
@@ -122,7 +121,7 @@ def getSummonerMasteryInfo(summonerID):
     return requestData
 
 def getChampionInformation():
-    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/10.16.1/data/en_US/champion.json"
+    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/10.24.1/data/en_US/champion.json"
     requestData = requests.get(completedRequestUrl).json()
     return requestData
 

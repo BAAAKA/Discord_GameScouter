@@ -4,7 +4,7 @@ from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
 
 
 # GetToken
-token = os.environ['discordTokenTest']
+token = os.environ['discordToken']
 print("Token: {}".format(token))
 
 client = discord.Client()

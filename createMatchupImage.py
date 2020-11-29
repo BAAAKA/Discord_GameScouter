@@ -94,9 +94,9 @@ def getMatchImage(matchInfo):
     middleImageX = 100
     middleImageY = 920
 
-    d.text((middleImageX, middleImageY), "Gamemode: "+matchInfo["gameMode"], font=getFontSized(35), fill=(255, 255, 255))
-    d.text((middleImageX+600, middleImageY), "Map: "+getMapById(matchInfo["mapId"]), font=getFontSized(35), fill=(255, 255, 255))
-    d.text((middleImageX+1540, middleImageY), "Bans: ", font=getFontSized(35), fill=(255, 255, 255))
+    d.text((middleImageX, middleImageY+100), "Gamemode: "+matchInfo["gameMode"], font=getFontSized(35), fill=(255, 255, 255))
+    d.text((middleImageX+600, middleImageY+100), "Map: "+getMapById(matchInfo["mapId"]), font=getFontSized(35), fill=(255, 255, 255))
+    d.text((middleImageX+1540, middleImageY+100), "Bans: ", font=getFontSized(35), fill=(255, 255, 255))
 
     # BANNED CHAMPIONS
     championInfo = getChampionInformation()

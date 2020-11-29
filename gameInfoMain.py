@@ -102,7 +102,7 @@ def getMatchInfo(message):
     summonerInfo = getSummonerApiInfo(summonerName)
     if summonerInfo:
         matchInfo = getMatchApiInfo(summonerInfo["id"])
-        if matchInfo == "SUMMONER IS NOT INGAME":  # TEST IF SUMMONER IS INGAME
+        if not matchInfo:  # TEST IF SUMMONER IS INGAME
             print("[INFO] Summoner is not ingame right now - done")
             returnText = "This summoner is not ingame right now..."
         else:
@@ -119,7 +119,7 @@ def getMatchInfo(message):
             summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
 
             if os.name == "nt":
-                time.sleep(5) #Delay because of rate limits; For some its way slower in Linux, therefore its only needed in windows
+                time.sleep(5) #Delay because of rate limits; For some unkown reason its way slower in Linux, therefore its only needed in windows
 
             # Async all summonerInfo requests
             summonerNameArray = []
@@ -412,52 +412,17 @@ def getChampionPlayCount(matchListInfo):
 def getHelpText():
     embedMessage = discord.Embed(title="Help", color=0x0099ff)
     embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details", inline=False)
-    embedMessage.add_field(name="**ig: <Summonername>** ", value="Match Details - lists game details", inline=False)
-    embedMessage.add_field(name="**help** ", value="You get some info... like this", inline=False)
-    embedMessage.add_field(name="**info** ", value="Information about the bot", inline=False)
-    embedMessage.add_field(name="**setName: <Summonername>** ", value="Set your summonername", inline=False)
-    embedMessage.add_field(name="**mGame** ", value="gets your game if you set it with setName", inline=False)
-    embedMessage.add_field(name="**mSummoner** ", value="gets your summoner if you set it with setName", inline=False)
-
+    embedMessage.add_field(name="**game: <Summonername>** ", value="Game Details - Current game details", inline=False)
+    embedMessage.add_field(name="**help:** ", value="You get some info... like this", inline=False)
+    embedMessage.add_field(name="**info:** ", value="Information about the bot", inline=False)
     return embedMessage
 
 def getInfoText():
     embedMessage = discord.Embed(title="Info", color=0x0099ff)
     embedMessage.add_field(name="**Creator** ", value="https://github.com/BAAAKA", inline=False)
-    embedMessage.add_field(name="**What is this** ", value="Bot that gives you league summoner and match information", inline=False)
+    embedMessage.add_field(name="**GitHub** ", value="https://github.com/BAAAKA/Discord_GameScouter", inline=False)
+    embedMessage.add_field(name="**What is this** ", value="Bot that gives you league summoner and match information. Use help: for more", inline=False)
     return embedMessage
-
-def getMatchReturnText(matchInfo):
-    summoners = []
-
-    for nr in range(10):
-        summoners.append(matchInfo["participants"][nr - 1])
-
-    returnText = "```"
-    returnText += "MODE: {} \n".format(matchInfo["gameMode"])
-    returnText += "ID: {} \n".format(matchInfo["gameId"])
-    returnText += "gameType: {} \n".format(matchInfo["gameType"])
-    returnText += "\n"
-    returnText += "# TEAM 1 \n"
-    for summoner in summoners:
-        if summoner["teamId"] == 100:
-            returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
-                summoner["summonerName"],
-                summoner["champion"],
-                summoner["RankTier"]
-            )
-
-    returnText += "# TEAM 2 \n"
-    for summoner in summoners:
-        if summoner["teamId"] == 200:
-            returnText += "Summonername: {} - Champion: {} - Rank {}\n".format(
-                summoner["summonerName"],
-                summoner["champion"],
-                summoner["RankTier"]
-            )
-
-    returnText += "```"
-    return returnText
 
 infoText = getFooterText("text")
 print("""
