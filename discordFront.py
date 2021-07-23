@@ -1,6 +1,6 @@
 import discord
 import os
-from gameInfoMain import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
+from gameInfoMain2 import getSummonerInfo, getMatchInfo, getHelpText, getInfoText
 
 
 # GetToken

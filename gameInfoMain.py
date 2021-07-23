@@ -5,7 +5,7 @@ from gameInfoRequests import *
 from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalSplash_700
 import time
-import summonerClass
+import classModule
 import pymysql
 
 
@@ -100,7 +100,7 @@ def getMatchInfo(message):
     else:
         summonerName = message.content.split("game:", 1)[1]
 
-    requestSummoner = summonerClass.summoner(summonerName)
+    requestSummoner = classModule.summoner(summonerName)
     summonerInfo = getSummonerApiInfo(requestSummoner.name)
     if not summonerInfo:
         returnText = "Summoner does not exist!"
@@ -126,7 +126,10 @@ def getMatchInfo(message):
     #Async all getSummonerRank requests
     summonerIDArray = []
     x = 0
-    for summoner in matchInfo["participants"]:
+    match = classModule.match(matchInfo)
+
+
+    for summoner in match.participants:
         summoner["number"] = x
         x+=1
         summonerIDArray.append(summoner["summonerId"])
@@ -136,7 +139,7 @@ def getMatchInfo(message):
 
     # Async all summonerInfo requests
     summonerNameArray = []
-    for summoner in matchInfo["participants"]:
+    for summoner in match.participants:
         summonerNameArray.append(summoner["summonerName"])
     summonerInfos = getSummonerApiInfoArray(summonerNameArray)
 
@@ -152,7 +155,17 @@ def getMatchInfo(message):
     matchListInfos = getMatchListApiInfoArray(accountIdArray)
 
     #Set All Data
-    for summoner in matchInfo["participants"]:
+    for participant in match.participants:
+        print(participant)
+        player = classModule.summoner(participant["summonerName"])
+        summonerInfo = getSummonerApiInfo(player.name)
+        player.setSummonerInfo(summonerInfo)
+        summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
+        match.players.append(player)
+
+    for summoner in match.participants:
+        player = classModule.summoner(participant["summonerName"])
+
         try:
             rankInfo = summonerRanks[summoner["number"]].json()
             matchListInfo = matchListInfos[summoner["number"]].json()
