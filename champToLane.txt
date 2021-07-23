@@ -19,7 +19,7 @@ Cassiopeia,Middle,ADC
 Chogath,Top,Middle
 Corki,Middle,NoLane
 Darius,Top,NoLane
-Diana,Middle,NoLane
+Diana,Jungle,Middle
 DrMundo,Top,Jungle
 Draven,ADC,NoLane
 Ekko,Jungle,Middle
@@ -101,7 +101,7 @@ Sejuani,Jungle,NoLane
 Seraphine,Support,Middle
 Senna,Support,ADC
 Samira,ADC,NoLane
-Sett,Jungle,Top
+Sett,Top,Support
 Shaco,Jungle,Support
 Shen,Top,Support
 Shyvana,Jungle,NoLane
@@ -150,3 +150,7 @@ Ziggs,Middle,ADC
 Zilean,Support,Middle
 Zoe,Middle,Support
 Zyra,Support,NoLane
+Rell,Support,NoLane
+Gwen,Top,Mid
+Viego,Jungel,Top
+Akshan,Mid,ADC
