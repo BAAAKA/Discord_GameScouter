@@ -41,10 +41,10 @@ async def on_message(message):
         await message.channel.send(file=image, embed=returnText[0])
         await loadingMessageFetched.delete()
 
-    if "help" == message.content.lower():
+    if "help:" == message.content.lower():
         await message.channel.send(embed=getHelpText())
 
-    if "info" == message.content.lower():
+    if "info:" == message.content.lower():
         await message.channel.send(embed=getInfoText())
 
 client.run(token)

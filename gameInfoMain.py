@@ -5,6 +5,7 @@ from gameInfoRequests import *
 from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalSplash_700
 import time
+import summonerClass
 import pymysql
 
 
@@ -99,99 +100,123 @@ def getMatchInfo(message):
     else:
         summonerName = message.content.split("game:", 1)[1]
 
-    summonerInfo = getSummonerApiInfo(summonerName)
-    if summonerInfo:
-        matchInfo = getMatchApiInfo(summonerInfo["id"])
-        if not matchInfo:  # TEST IF SUMMONER IS INGAME
-            print("[INFO] Summoner is not ingame right now - done")
-            returnText = "This summoner is not ingame right now..."
-        else:
-            # here you know that the summoner exists and is ingame
-            lanes = []
-            championInfo = getChampionInformation()
-            #Async all getSummonerRank requests
-            summonerIDArray = []
-            x = 0
-            for summoner in matchInfo["participants"]:
-                summoner["number"] = x
-                x+=1
-                summonerIDArray.append(summoner["summonerId"])
-            summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
-
-            if os.name == "nt":
-                time.sleep(5) #Delay because of rate limits; For some unkown reason its way slower in Linux, therefore its only needed in windows
-
-            # Async all summonerInfo requests
-            summonerNameArray = []
-            for summoner in matchInfo["participants"]:
-                summonerNameArray.append(summoner["summonerName"])
-            summonerInfos = getSummonerApiInfoArray(summonerNameArray)
-
-            # Async all matchListInfo requests
-            accountIdArray = []
-            for summoner in summonerInfos:
-                summoner = summoner.json()
-                accountIdArray.append(summoner["accountId"])
-            matchListInfos = getMatchListApiInfoArray(accountIdArray)
-
-            #Set All Data
-            for summoner in matchInfo["participants"]:
-                rankInfo = summonerRanks[summoner["number"]].json()
-                matchListInfo = matchListInfos[summoner["number"]].json()
-
-                Tier = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "tier")
-                if re.search("SUMMONER HAS NO RANK*", Tier):
-                    summonerRank = "Unranked"
-                    summoner["tier"] = summonerRank
-                    summoner["RankTier"] = summonerRank
-                    summoner["wins"] = "0"
-                    summoner["losses"] = "0"
-                    summoner["winRate"] = "0"
-
-                else:
-                    Rank = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "rank")
-                    summonerRank = Tier + " " + Rank
-                    summoner["tier"] = Tier
-                    summoner["RankTier"] = summonerRank
-                    summoner["wins"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "wins")
-                    summoner["losses"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "losses")
-                    summoner["winRate"] = getWinrate(rankInfo, "RANKED_SOLO_5x5")
-                # Champion
-                summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
-                # Lanes
-                laneCount = getLanePlayCount(matchListInfo)
-                mostPlayedLane = []
-                for i in range(len(laneCount)):
-                    mostPlayedLane.append(list(max(laneCount.items(), key=operator.itemgetter(1))))
-                    del laneCount[mostPlayedLane[i][0]]
-                summoner["mostPlayedLanes"] = mostPlayedLane
-
-                # Champions
-                championCount = getChampionPlayCount(matchListInfo)
-                mostPlayedChamp = []
-                for i in range(3):
-                    mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
-                    championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
-                    mostPlayedChamp[i].append(championName)
-                    del championCount[mostPlayedChamp[i][0]]
-                summoner["mostPlayedChamps"] = mostPlayedChamp
-
-
-            # Lane allocation
-            matchInfo["participants"] = setLaneByChamp(matchInfo["participants"])
-
-            print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
-            start_timeImage = time.time()
-            filePath = getMatchImage(matchInfo)
-            print("[INFO] ----------------- %s seconds for the creation of the image -----------------" % (time.time() - start_timeImage))
-            print("[INFO] ----------------- %s seconds for total match request -----------------" % (time.time() - start_time))
-
-            embedMessage = discord.Embed(color=0x0099ff)
-            embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
-            embedMessage.set_image(url="attachment://matchImage.jpg")
-            returnText = embedMessage, filePath
-    else:
+    requestSummoner = summonerClass.summoner(summonerName)
+    summonerInfo = getSummonerApiInfo(requestSummoner.name)
+    if not summonerInfo:
         returnText = "Summoner does not exist!"
+        return returnText
+
+    requestSummoner.setSummonerInfo(summonerInfo)
+
+    try:
+        matchInfo = getMatchApiInfo(requestSummoner.id)
+    except:
+        print("[ERROR] Error while trying to see if summoner is ingame")
+        returnText = "Error while trying to see if summoner is ingame..."
+        return returnText
+
+    if not matchInfo:  # TEST IF SUMMONER IS INGAME
+        print("[INFO] Summoner is not ingame right now - done")
+        returnText = "This summoner is not ingame right now..."
+        return returnText
+
+
+    # here you know that the summoner exists and is ingame
+    championInfo = getChampionInformation()
+    #Async all getSummonerRank requests
+    summonerIDArray = []
+    x = 0
+    for summoner in matchInfo["participants"]:
+        summoner["number"] = x
+        x+=1
+        summonerIDArray.append(summoner["summonerId"])
+    summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
+
+    time.sleep(1)
+
+    # Async all summonerInfo requests
+    summonerNameArray = []
+    for summoner in matchInfo["participants"]:
+        summonerNameArray.append(summoner["summonerName"])
+    summonerInfos = getSummonerApiInfoArray(summonerNameArray)
+
+    # Async all matchListInfo requests
+    accountIdArray = []
+    for summoner in summonerInfos:
+        summoner = summoner.json()
+        try:
+            accountIdArray.append(summoner["accountId"])
+        except:
+            print("[ERROR] Summoner has no accountID: {}".format(summoner))
+            accountIdArray.append("NONE")
+    matchListInfos = getMatchListApiInfoArray(accountIdArray)
+
+    #Set All Data
+    for summoner in matchInfo["participants"]:
+        try:
+            rankInfo = summonerRanks[summoner["number"]].json()
+            matchListInfo = matchListInfos[summoner["number"]].json()
+            Tier = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "tier")
+            if re.search("SUMMONER HAS NO RANK*", Tier):
+                summonerRank = "Unranked"
+                summoner["tier"] = summonerRank
+                summoner["RankTier"] = summonerRank
+                summoner["wins"] = "0"
+                summoner["losses"] = "0"
+                summoner["winRate"] = "0"
+
+            else:
+                Rank = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "rank")
+                summonerRank = Tier + " " + Rank
+                summoner["tier"] = Tier
+                summoner["RankTier"] = summonerRank
+                summoner["wins"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "wins")
+                summoner["losses"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "losses")
+                summoner["winRate"] = getWinrate(rankInfo, "RANKED_SOLO_5x5")
+            # Champion
+            summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
+            # Lanes
+            laneCount = getLanePlayCount(matchListInfo)
+            mostPlayedLane = []
+            for i in range(len(laneCount)):
+                mostPlayedLane.append(list(max(laneCount.items(), key=operator.itemgetter(1))))
+                del laneCount[mostPlayedLane[i][0]]
+            summoner["mostPlayedLanes"] = mostPlayedLane
+
+            # Champions
+            championCount = getChampionPlayCount(matchListInfo)
+            mostPlayedChamp = []
+            for i in range(3):
+                mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
+                championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
+                mostPlayedChamp[i].append(championName)
+                del championCount[mostPlayedChamp[i][0]]
+            summoner["mostPlayedChamps"] = mostPlayedChamp
+        except:
+            print("[ERROR] Error while getting JSON, because of accountID?: {}".format(summoner))
+            summoner["mostPlayedLanes"] = ["---"]
+            summoner["mostPlayedChamps"] = ["---"]
+            summonerRank = "Unranked"
+            summoner["tier"] = summonerRank
+            summoner["RankTier"] = summonerRank
+            summoner["wins"] = "0"
+            summoner["losses"] = "0"
+            summoner["winRate"] = "0"
+            continue
+
+    # Lane allocation
+    matchInfo["participants"] = setLaneByChamp(matchInfo["participants"])
+
+    print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
+    start_timeImage = time.time()
+    filePath = getMatchImage(matchInfo)
+    print("[INFO] ----------------- %s seconds for the creation of the image -----------------" % (time.time() - start_timeImage))
+    print("[INFO] ----------------- %s seconds for total match request -----------------" % (time.time() - start_time))
+
+    embedMessage = discord.Embed(color=0x0099ff)
+    embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
+    embedMessage.set_image(url="attachment://matchImage.jpg")
+    returnText = embedMessage, filePath
     return returnText
 
 def setLaneByChamp(summoners):
@@ -374,9 +399,14 @@ def getRankAndLP(queueTypeInfo, queueType):
 
 def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
     for qType in queueTypeInfo:  # TEST IF SUMMONER HAS THIS QUEUETYPE RANK
-        if qType["queueType"] == queueType:
-            rankInfo = qType[whatInfo]
-            return rankInfo
+        try:
+            if qType["queueType"] == queueType:
+                rankInfo = qType[whatInfo]
+                return rankInfo
+        except:
+            print("[ERROR] False type in getSummonerRankInfoDetails, Rate limit exceeded? - Returned <NO RANK>")
+            return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
+
     print("[INFO] SUMMONER HAS NO RANK IN THIS QUEUE TYPE")
     return "SUMMONER HAS NO RANK IN THIS QUEUE TYPE"
 

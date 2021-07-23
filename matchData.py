@@ -14,7 +14,6 @@ imageArenaPath2 = Path(r"data/img/global/arena2.png")
 imageArenaBigPath = Path(r"data/img/global/arenaBig.jpg")
 imageArenaCleanPath = Path(r"data/img/global/arenaClean.png")
 
-
 summonerSpells = {}
 summonerSpells[1] = "Cleanse"
 summonerSpells[3] = "Exhaust"
@@ -29,28 +28,27 @@ summonerSpells[21] = "Barrier"
 summonerSpells[32] = "Mark"
 
 perks = {}
-perks[8005] = "Precision","PressTheAttack"
-perks[8008] = "Precision","LethalTempoTemp"
-perks[8010] = "Precision","Conqueror"
-perks[8021] = "Precision","FleetFootwork"
+perks[8005] = "Precision", "PressTheAttack"
+perks[8008] = "Precision", "LethalTempoTemp"
+perks[8010] = "Precision", "Conqueror"
+perks[8021] = "Precision", "FleetFootwork"
 
-perks[8112] = "Domination","Electrocute"
-perks[8124] = "Domination","Predator"
-perks[8128] = "Domination","DarkHarvest"
-perks[9923] = "Domination","HailOfBlades"
+perks[8112] = "Domination", "Electrocute"
+perks[8124] = "Domination", "Predator"
+perks[8128] = "Domination", "DarkHarvest"
+perks[9923] = "Domination", "HailOfBlades"
 
-perks[8214] = "Sorcery","SummonAery"
-perks[8229] = "Sorcery","ArcaneComet"
-perks[8230] = "Sorcery","PhaseRush"
+perks[8214] = "Sorcery", "SummonAery"
+perks[8229] = "Sorcery", "ArcaneComet"
+perks[8230] = "Sorcery", "PhaseRush"
 
-perks[8351] = "Inspiration","GlacialAugment"
-perks[8360] = "Inspiration","UnsealedSpellbook"
-perks[83] = "Inspiration","GlacialAugment"
+perks[8351] = "Inspiration", "GlacialAugment"
+perks[8360] = "Inspiration", "UnsealedSpellbook"
+perks[83] = "Inspiration", "GlacialAugment"
 
-perks[8437] = "Resolve","GraspOfTheUndying"
-perks[8439] = "Resolve","VeteranAftershock"
-perks[8465] = "Resolve","Guardian"
-
+perks[8437] = "Resolve", "GraspOfTheUndying"
+perks[8439] = "Resolve", "VeteranAftershock"
+perks[8465] = "Resolve", "Guardian"
 
 if os.name == "nt":
     print("[INFO] WINDOWS FONT")
@@ -59,48 +57,59 @@ else:
     print("[INFO] LINUX FONT")
     fontPath = r"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
+
 def getFont():
     return fontPath
+
 
 def getArena():
     return Image.open(imageArenaPath)
 
+
 def getArenaClean():
     return Image.open(imageArenaCleanPath)
+
 
 def getArena2():
     return Image.open(imageArenaPath2)
 
+
 def getArenaBig():
     return Image.open(imageArenaBigPath)
+
 
 def getLocalLoadingImage(champion):
     path = Path(imageChampionFolder + "/{}_0.jpg".format(champion))
     return path
 
+
 def getLocalTitlesImage(champion):
     path = Path(imageTitlesFolder + "/{}_0.jpg".format(champion))
     if os.path.isfile(path):
         return path
-    else: #If Champion doesnt exist
+    else:  # If Champion doesnt exist
         defaultTitlesPath = Path(imageTitlesFolder + "/{}.jpg".format("default"))
         return defaultTitlesPath
+
 
 def getLocalRankedImage(rank):
     path = Path(imageRankFolder + "/Emblem_{}.png".format(rank))
     return path
 
+
 def getLocalSummonersImage(summoners):
     path = Path(imageSummonersFolder + "/{}.png".format(summoners))
     return path
+
 
 def getLocalSplash_700(champion):
     path = Path(imageSplash700Folder + "/{}_0.jpg".format(champion))
     if os.path.isfile(path):
         return path
-    else: #If Champion doesnt exist
+    else:  # If Champion doesnt exist
         defaultTitlesPath = Path(imageTitlesFolder + "/{}.jpg".format("default"))
         return defaultTitlesPath
+
 
 def getLocalPerkImage(perkId):
     try:
@@ -117,21 +126,25 @@ def getLocalPerkImage(perkId):
 def getNameById(id):
     return summonerSpells[id]
 
+
 def getMapById(id):
-    if(id == 11):
+    if (id == 11):
         return "Summoners Rift"
-    elif(id == 12):
+    elif (id == 12):
         return "Howling Abyss"
     else:
-        return "idk this map, what is it, take this id: "+str(id)
+        return "idk this map, what is it, take this id: " + str(id)
+
 
 def getSplashURL(champion):
-    url="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
+    url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
     return url
 
+
 def getLoadingURL(champion):
-    url="https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{}_0.jpg".format(champion)
+    url = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{}_0.jpg".format(champion)
     return url
+
 
 def getChampionByID(championInfo, championID):
     for championNames in championInfo["data"]:
@@ -142,40 +155,46 @@ def getChampionByID(championInfo, championID):
     print("[ERROR] Unknown Champion ID: {}".format(championID))
     return "No Champion with ID: {}".format(championID)
 
-def getAreaOfSplash(width,height):
-    imageHeight=560
-    imageWidth=308
-    x2=width+imageWidth
-    y2=height+imageHeight
-    return width,height,x2,y2
 
-def getAreaOfEmblem(width,height):
-    imageHeight=585
-    imageWidth=512
-    x2=width+imageWidth
-    y2=height+imageHeight
-    return width,height,x2,y2
+def getAreaOfSplash(width, height):
+    imageHeight = 560
+    imageWidth = 308
+    x2 = width + imageWidth
+    y2 = height + imageHeight
+    return width, height, x2, y2
 
-def getAreaOfTitles(width,height):
-    imageHeight=380
-    imageWidth=380
-    x2=width+imageWidth
-    y2=height+imageHeight
-    return width,height,x2,y2
 
-def getAreaOfSpells(width,height):
-    imageHeight=64
-    imageWidth=64
-    x2=width+imageWidth
-    y2=height+imageHeight
-    return width,height,x2,y2
+def getAreaOfEmblem(width, height):
+    imageHeight = 585
+    imageWidth = 512
+    x2 = width + imageWidth
+    y2 = height + imageHeight
+    return width, height, x2, y2
 
-def getAreaOfCustom(width,height, size):
-    imageHeight=size
-    imageWidth=size
-    x2=width+imageWidth
-    y2=height+imageHeight
-    return width,height,x2,y2
+
+def getAreaOfTitles(width, height):
+    imageHeight = 380
+    imageWidth = 380
+    x2 = width + imageWidth
+    y2 = height + imageHeight
+    return width, height, x2, y2
+
+
+def getAreaOfSpells(width, height):
+    imageHeight = 64
+    imageWidth = 64
+    x2 = width + imageWidth
+    y2 = height + imageHeight
+    return width, height, x2, y2
+
+
+def getAreaOfCustom(width, height, size):
+    imageHeight = size
+    imageWidth = size
+    x2 = width + imageWidth
+    y2 = height + imageHeight
+    return width, height, x2, y2
+
 
 summoner1 = {}
 summoner2 = {}
@@ -238,8 +257,7 @@ summoner10["lane"] = "support"
 summoner10["champion"] = "Soraka"
 summoner10["tier"] = "Silver"
 
-
-summoners={}
+summoners = {}
 summoners["1"] = summoner1
 summoners["2"] = summoner2
 summoners["3"] = summoner3
@@ -255,8 +273,10 @@ for summoner in summoners:
     summoners[summoner]["championImage"] = Image.open(getLocalTitlesImage(summoners[summoner]["champion"]))
     summoners[summoner]["rankImage"] = Image.open(getLocalRankedImage(summoners[summoner]["tier"]))
 
+
 def getSummoners():
     return summoners
+
 
 yStartTeam1 = 100
 yStartTeam2 = 1245
@@ -270,5 +290,3 @@ startPositions["Support"] = 2000
 
 def getStartPositions():
     return startPositions, yStartTeam1, yStartTeam2
-
-
