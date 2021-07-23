@@ -62,9 +62,9 @@ def getSummonerInfo(message):
         else:
             print("[INFO] Summoner has no mastery!")
 
-        #Most Played Champs
+        # Most Played Champs
         matchListInfo = getMatchListApiInfo(summonerInfo["accountId"])
-        if "status" not in matchListInfo: #If status key exists in the matchListInfo directory its probably a 404, does not exist
+        if "status" not in matchListInfo:  # If status key exists in the matchListInfo directory its probably a 404, does not exist
             championCount = getChampionPlayCount(matchListInfo)
             championInfo = getChampionInformation()
             mostPlayedChamp = []
@@ -75,12 +75,14 @@ def getSummonerInfo(message):
                 del championCount[mostPlayedChamp[i][0]]
 
             champNames = getMostPlayedText(mostPlayedChamp[0][2], mostPlayedChamp[1][2], mostPlayedChamp[2][2])
-            champPlayedAmount = "{}x\n{}x\n{}x".format(mostPlayedChamp[0][1], mostPlayedChamp[1][1], mostPlayedChamp[2][1])
+            champPlayedAmount = "{}x\n{}x\n{}x".format(mostPlayedChamp[0][1], mostPlayedChamp[1][1],
+                                                       mostPlayedChamp[2][1])
 
             embedMessage.add_field(name="Most played recently", value=champNames, inline=True)
             embedMessage.add_field(name="Last 100 games", value=champPlayedAmount, inline=True)
 
-            embedMessage.set_thumbnail(url=getSummonerIconURL_withID(summonerInfo["profileIconId"])) #Set Summoner Icon Avatar
+            embedMessage.set_thumbnail(
+                url=getSummonerIconURL_withID(summonerInfo["profileIconId"]))  # Set Summoner Icon Avatar
             filepath = getLocalSplash_700(mostPlayedChamp[0][2])
         else:
             filepath = getLocalSplash_700("Kindred")
@@ -89,8 +91,10 @@ def getSummonerInfo(message):
         return "Summoner does not exist"
 
     embedMessage.set_footer(text=getFooterText("text"), icon_url=getFooterText("url"))
-    print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (time.time() - start_time))
+    print("[INFO] ----------------- %s seconds for the getSummonerInfo request -----------------" % (
+                time.time() - start_time))
     return embedMessage, filepath
+
 
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
@@ -106,9 +110,8 @@ def getMatchInfo(message):
         returnText = "Summoner does not exist!"
         return returnText
 
-    requestSummoner.setSummonerInfo(summonerInfo)
-
     try:
+        requestSummoner.setSummonerInfo(summonerInfo)
         matchInfo = getMatchApiInfo(requestSummoner.id)
     except:
         print("[ERROR] Error while trying to see if summoner is ingame")
@@ -120,18 +123,14 @@ def getMatchInfo(message):
         returnText = "This summoner is not ingame right now..."
         return returnText
 
-
     # here you know that the summoner exists and is ingame
     championInfo = getChampionInformation()
-    #Async all getSummonerRank requests
+    # Async all getSummonerRank requests
     summonerIDArray = []
-    x = 0
+
     match = classModule.match(matchInfo)
 
-
     for summoner in match.participants:
-        summoner["number"] = x
-        x+=1
         summonerIDArray.append(summoner["summonerId"])
     summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
 
@@ -154,76 +153,69 @@ def getMatchInfo(message):
             accountIdArray.append("NONE")
     matchListInfos = getMatchListApiInfoArray(accountIdArray)
 
-    #Set All Data
+    # Set All Data
+    nr = 0
     for participant in match.participants:
-        print(participant)
         player = classModule.summoner(participant["summonerName"])
-        summonerInfo = getSummonerApiInfo(player.name)
-        player.setSummonerInfo(summonerInfo)
-        summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
+        player.teamId = participant["teamId"]
+        player.spell1Id = participant["spell1Id"]
+        player.spell2Id = participant["spell2Id"]
+        player.championId = participant["championId"]
+        player.profileIconId = participant["profileIconId"]
+        player.bot = participant["bot"]
+        player.summonerId = participant["summonerId"]
+        player.gameCustomizationObjects = participant["gameCustomizationObjects"]
+        player.perks = participant["perks"]
+        player.nr = nr
+        player.champion = getChampionByID(championInfo, player.championId)
         match.players.append(player)
+        print("[INFO] Appended player {}".format(player.name))
+        nr += 1  # nr wird für matchlist genutzt, da bei dem keine summer info dabei ist
 
-    for summoner in match.participants:
-        player = classModule.summoner(participant["summonerName"])
+    print("[INFO] ====Beginning Rank/MatchList/SummonerInfo defining====")
+    for player in match.players:
+        player.matchList = matchListInfos[player.nr].json()
+        player.mainChamp = getChampionByID(championInfo, player.getMostPalyedChamp())
+        for rank in summonerRanks:
+            ranked = rank.json()
+            if len(ranked) > 0:
+                try:
+                    if ranked[0]["summonerId"] == player.summonerId:  # Correct player (Name doesnt work always)
+                        if ranked[0]["queueType"] == "RANKED_SOLO_5x5":
+                            player.setRankInfo(ranked[0])
+                            print("[INFO] Player {} has the Rank {} in {}".format(player.name, player.rankTier,
+                                                                                  "RANKED_SOLO_5x5"))
+                            if len(ranked) > 1:
+                                player.setFlexRankInfo(ranked[1])
+                                print("[INFO] Player {} has the Rank {} in {}".format(player.name, player.FrankTier,
+                                                                                      "RANKED_FLEX_SR"))
+                            break
+                        elif ranked[0]["queueType"] == "RANKED_FLEX_SR":
+                            player.setFlexRankInfo(ranked[0])
+                            if len(ranked) > 1:
+                                player.setRankInfo(ranked[1])
+                                print("[INFO] Player {} has the Rank {} in {}".format(player.name, player.FrankTier,
+                                                                                      "RANKED_SOLO_5x5"))
+                            break
+                except:
+                    print("[ERROR] While setting Rankf or Player {}, Rate Limit? ".format(player.name))
+                    break
 
-        try:
-            rankInfo = summonerRanks[summoner["number"]].json()
-            matchListInfo = matchListInfos[summoner["number"]].json()
-            Tier = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "tier")
-            if re.search("SUMMONER HAS NO RANK*", Tier):
-                summonerRank = "Unranked"
-                summoner["tier"] = summonerRank
-                summoner["RankTier"] = summonerRank
-                summoner["wins"] = "0"
-                summoner["losses"] = "0"
-                summoner["winRate"] = "0"
-
-            else:
-                Rank = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "rank")
-                summonerRank = Tier + " " + Rank
-                summoner["tier"] = Tier
-                summoner["RankTier"] = summonerRank
-                summoner["wins"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "wins")
-                summoner["losses"] = getSummonerRankInfoDetails(rankInfo, "RANKED_SOLO_5x5", "losses")
-                summoner["winRate"] = getWinrate(rankInfo, "RANKED_SOLO_5x5")
-            # Champion
-            summoner["champion"] = getChampionByID(championInfo, summoner["championId"])
-            # Lanes
-            laneCount = getLanePlayCount(matchListInfo)
-            mostPlayedLane = []
-            for i in range(len(laneCount)):
-                mostPlayedLane.append(list(max(laneCount.items(), key=operator.itemgetter(1))))
-                del laneCount[mostPlayedLane[i][0]]
-            summoner["mostPlayedLanes"] = mostPlayedLane
-
-            # Champions
-            championCount = getChampionPlayCount(matchListInfo)
-            mostPlayedChamp = []
-            for i in range(3):
-                mostPlayedChamp.append(list(max(championCount.items(), key=operator.itemgetter(1))))
-                championName = getChampionByID(championInfo, mostPlayedChamp[i][0])
-                mostPlayedChamp[i].append(championName)
-                del championCount[mostPlayedChamp[i][0]]
-            summoner["mostPlayedChamps"] = mostPlayedChamp
-        except:
-            print("[ERROR] Error while getting JSON, because of accountID?: {}".format(summoner))
-            summoner["mostPlayedLanes"] = ["---"]
-            summoner["mostPlayedChamps"] = ["---"]
-            summonerRank = "Unranked"
-            summoner["tier"] = summonerRank
-            summoner["RankTier"] = summonerRank
-            summoner["wins"] = "0"
-            summoner["losses"] = "0"
-            summoner["winRate"] = "0"
-            continue
+        for summoner in summonerInfos:
+            summoner = summoner.json()
+            if summoner["name"] == player.name:
+                player.setSummonerInfo(summoner)
+                continue
 
     # Lane allocation
-    matchInfo["participants"] = setLaneByChamp(matchInfo["participants"])
+    setLaneByChamp(match)
 
-    print("[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
+    print(
+        "[INFO] ----------------- %s seconds for the getMatchInfo data -----------------" % (time.time() - start_time))
     start_timeImage = time.time()
-    filePath = getMatchImage(matchInfo)
-    print("[INFO] ----------------- %s seconds for the creation of the image -----------------" % (time.time() - start_timeImage))
+    filePath = getMatchImage(match)
+    print("[INFO] ----------------- %s seconds for the creation of the image -----------------" % (
+                time.time() - start_timeImage))
     print("[INFO] ----------------- %s seconds for total match request -----------------" % (time.time() - start_time))
 
     embedMessage = discord.Embed(color=0x0099ff)
@@ -232,7 +224,8 @@ def getMatchInfo(message):
     returnText = embedMessage, filePath
     return returnText
 
-def setLaneByChamp(summoners):
+
+def setLaneByChamp(match):
     print("[INFO] ====Beginning Lane Allocation====")
     rawChampData = readTextfile("champToLane.txt")
     champData = {}
@@ -246,72 +239,76 @@ def setLaneByChamp(summoners):
     teamId = 100
     while lanes and maxLoop > r:
         success = False
-        for summoner in summoners:
-            if not "lane" in summoner and summoner["teamId"] == teamId and "Jungle" in lanes:
-                if getNameById(summoner["spell1Id"]) == "Smite" or getNameById(summoner["spell2Id"]) == "Smite":
-                    print("[INFO] Found the jungler with Smite! <{}> is playing <{}> in the Jungle with smite".format(summoner["summonerName"],summoner["champion"]))
+        for player in match.players:
+            if player.lane == "none" and player.teamId == teamId and "Jungle" in lanes:  # Set JGL
+                if getNameById(player.spell1Id) == "Smite" or getNameById(player.spell2Id) == "Smite":
+                    print("[INFO] Found the jungler with Smite! <{}> is playing <{}> in the Jungle with smite".format(
+                        player.name, player.champion))
                     lanes.remove("Jungle")
-                    summoner["lane"] = "Jungle"
-
+                    player.lane = "Jungle"
         lane = lanes[0]
         print("[INFO] looking for play in the lane: {}".format(lane))
-        for summoner in summoners:
-            if not "lane" in summoner and summoner["teamId"] == teamId:
-                champ = summoner["champion"]
+        for player in match.players:
+            if player.lane == "none" and player.teamId == teamId:
+                champ = player.champion
                 try:
-                    print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
-                                                                                          summoner["champion"],
-                                                                                          champData[champ][0]))
+                    print("[INFO] Player <{}> is playing <{}> and is searching for Lane <{}>".format(player.name,
+                                                                                                     player.champion,
+                                                                                                     champData[champ][
+                                                                                                         0]))
                     if (champData[champ][0] == lane):
-                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
-                                                                                             summoner["champion"], lane))
+                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(
+                            player.name,
+                            player.champion, lane))
                         success = True
                         lanes.remove(lane)
-                        summoner["lane"] = lane
+                        player.lane = lane
                         break
                 except:
                     print("[ERROR] I HAVE NOT SEEN THIS CHAMPION BEFORE")
                     success = True
                     lanes.remove(lane)
-                    summoner["lane"] = lane
+                    player.lane = lane
                     break
 
         if not success:
             print("[INFO] Couldnt find any primary position, looking for a secondary position!")
-            for summoner in summoners:
-                if not "lane" in summoner and summoner["teamId"] == teamId:
-                    champ = summoner["champion"]
-                    print("[INFO] summoner <{}> is playing <{}> and is searching for Lane <{}>".format(summoner["summonerName"],
-                                                                                          summoner["champion"],
-                                                                                          champData[champ][1]))
+            for player in match.players:
+                if player.lane == "none" and player.teamId == teamId:
+                    champ = player.champion
+                    print("[INFO] Player <{}> is playing <{}> and is searching for Lane <{}>".format(player.name,
+                                                                                                     player.champion,
+                                                                                                     champData[champ][
+                                                                                                         1]))
                     if (champData[champ][1] == lane):
-                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(summoner["summonerName"],
-                                                                                             summoner["champion"],
-                                                                                             lane))
+                        print("[INFO] [FOUND CORRECT LANE] player <{}> is playing <{}> on the lane <{}>".format(
+                            player.name,
+                            player.champion, lane))
                         success = True
                         lanes.remove(lane)
-                        summoner["lane"] = lane
+                        player.lane = lane
                         break
         if not success:
-            for summoner in summoners:
-                if not "lane" in summoner and summoner["teamId"] == teamId:
+            for player in match.players:
+                if player.lane == "none" and player.teamId == teamId:
                     print(
-                        "[INFO] [FAIL] Couldnt find Lane - Player <{}> is now playing <{}> on the lane <{}>".format(summoner["summonerName"], summoner["champion"],
-                                                                                 lane))
+                        "[INFO] [FAIL] Couldnt find Lane - Player <{}> is now playing <{}> on the lane <{}>".format(
+                            player.name,
+                            player.champion, lane))
                     lanes.remove(lane)
-                    summoner["lane"] = lane
+                    player.lane = lane
                     break
         r += 1
         if teamId == 100:
             teamId = 200
-            for summoner in summoners:
-                if summoner["teamId"] == 100 and "lane" not in summoner:
+            for player in match.players:
+                if player.teamId == 100 and player.lane == "none":
                     teamId = 100
                     break
             if teamId == 200:
                 print("[INFO] All Player of the first team have a lane - TEAM SWITCH!")
                 lanes = ["Jungle", "Top", "Middle", "Support", "ADC"]
-    return summoners
+
 
 def readTextfile(filename):
     text_file = open(filename, "r")
@@ -322,9 +319,11 @@ def readTextfile(filename):
     print("[INFO] Succesfully read the textfile {}".format(filename))
     return content
 
+
 def getSplashURL(champion):
     url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
     return url
+
 
 def getFooterText(type):
     text = 'gameScouter V4.0 - C 60'
@@ -337,15 +336,16 @@ def getFooterText(type):
         print("[ERROR] Unknown footer type")
         return None
 
+
 def getLane(spell1, spell2, lanes, mainLane):
     spell = getNameById(spell1)
     if getNameById(spell1) == "Flash":
         spell = getNameById(spell2)
-    topSpells = ["Teleport","Ignite"]
+    topSpells = ["Teleport", "Ignite"]
     jungleSpells = ["Smite"]
-    midSpells = ["Ignite","Cleanse","Barrier"]
+    midSpells = ["Ignite", "Cleanse", "Barrier"]
     adcSpells = ["Heal"]
-    supportSpells = ["Ignite","Exhaust"]
+    supportSpells = ["Ignite", "Exhaust"]
     if "Mid" in lanes:
         if spell in midSpells:
             return "Mid"
@@ -365,14 +365,17 @@ def getLane(spell1, spell2, lanes, mainLane):
         return mainLane
     return lanes[0]
 
+
 def getMasteryChampion(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
     mostPlayedChamp1 = getChampionByID(getChampionInformation(), MasteryInfoDetails1["championId"])
     mostPlayedChamp2 = getChampionByID(getChampionInformation(), MasteryInfoDetails2["championId"])
     mostPlayedChamp3 = getChampionByID(getChampionInformation(), MasteryInfoDetails3["championId"])
     return ":small_orange_diamond: " + mostPlayedChamp1 + "\n:small_orange_diamond: " + mostPlayedChamp2 + "\n:small_orange_diamond: " + mostPlayedChamp3
 
-def getMostPlayedText(c1, c2, c3): #Return text for SU: most played champ
+
+def getMostPlayedText(c1, c2, c3):  # Return text for SU: most played champ
     return ":fleur_de_lis: " + c1 + "\n:fleur_de_lis: " + c2 + "\n:fleur_de_lis: " + c3
+
 
 def getMasteryLevel(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
     mostPlayedChampLevel1 = str(MasteryInfoDetails1["championLevel"])
@@ -395,6 +398,7 @@ def getChampionByID(championInfo, championID):
     print("[ERROR] Unknown Champion ID: {}".format(championID))
     return "No Champion with ID: {}".format(championID)
 
+
 def getWinrate(queueTypeInfo, queueType):
     totalWins = getSummonerRankInfoDetails(queueTypeInfo, queueType, "wins")
     totalLosses = getSummonerRankInfoDetails(queueTypeInfo, queueType, "losses")
@@ -409,6 +413,7 @@ def getRankAndLP(queueTypeInfo, queueType):
     lp = str(getSummonerRankInfoDetails(queueTypeInfo, queueType, "leaguePoints"))
     returnText = tier + " " + rank + " - " + lp + " LP"
     return returnText
+
 
 def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
     for qType in queueTypeInfo:  # TEST IF SUMMONER HAS THIS QUEUETYPE RANK
@@ -427,20 +432,6 @@ def getSummonerRankInfoDetails(queueTypeInfo, queueType, whatInfo):
 def getSummonerMasteryInfoDetails(masteryInfo, placed):
     return masteryInfo[placed - 1]
 
-def getLanePlayCount(matchListInfo):
-    laneCount = {}
-    try:
-        matchListInfo["matches"]
-    except:
-        print("[ERROR] No <matches> found, matchListInfo: {}".format(matchListInfo))
-    for match in matchListInfo["matches"]:
-        lane = match["lane"]
-        if lane == "BOTTOM":
-            lane = match["role"]
-        if lane not in laneCount:
-            laneCount[lane] = 0
-        laneCount[lane] += 1
-    return laneCount
 
 def getChampionPlayCount(matchListInfo):
     championCount = {}
@@ -454,18 +445,23 @@ def getChampionPlayCount(matchListInfo):
 
 def getHelpText():
     embedMessage = discord.Embed(title="Help", color=0x0099ff)
-    embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details", inline=False)
+    embedMessage.add_field(name="**su: <Summonername>** ", value="Summoner Details - lists summoner details",
+                           inline=False)
     embedMessage.add_field(name="**game: <Summonername>** ", value="Game Details - Current game details", inline=False)
     embedMessage.add_field(name="**help:** ", value="You get some info... like this", inline=False)
     embedMessage.add_field(name="**info:** ", value="Information about the bot", inline=False)
     return embedMessage
 
+
 def getInfoText():
     embedMessage = discord.Embed(title="Info", color=0x0099ff)
     embedMessage.add_field(name="**Creator** ", value="https://github.com/BAAAKA", inline=False)
     embedMessage.add_field(name="**GitHub** ", value="https://github.com/BAAAKA/Discord_GameScouter", inline=False)
-    embedMessage.add_field(name="**What is this** ", value="Bot that gives you league summoner and match information. Use help: for more", inline=False)
+    embedMessage.add_field(name="**What is this** ",
+                           value="Bot that gives you league summoner and match information. Use help: for more",
+                           inline=False)
     return embedMessage
+
 
 infoText = getFooterText("text")
 print("""
