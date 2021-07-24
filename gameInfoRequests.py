@@ -121,7 +121,7 @@ def getSummonerMasteryInfo(summonerID):
     return requestData
 
 def getChampionInformation(): #Get Update here https://developer.riotgames.com/docs/lol
-    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/11.14.1/data/en_US/champion.json"
+    completedRequestUrl = "https://ddragon.leagueoflegends.com/cdn/11.15.1/data/en_US/champion.json"
     requestData = requests.get(completedRequestUrl).json()
     return requestData
 

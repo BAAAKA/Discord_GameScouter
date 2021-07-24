@@ -110,7 +110,7 @@ def getMatchImage(match):
     filename = time.strftime("MATCH%Y%m%d-%H%M%S.jpg")
     filePath = "temp/{}".format(filename)
     imageArena_jpg = imageArena.convert('RGB')
-    imageArena_jpg.save(filePath)
+    imageArena_jpg.save(filePath, quality=50)
     print("[INFO] Done with match Image!")
     return filePath
 

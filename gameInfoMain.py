@@ -6,6 +6,7 @@ from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalSplash_700
 import time
 import classModule
+from DBConnector import input, read, exists, updating
 import pymysql
 
 
@@ -99,15 +100,46 @@ def getSummonerInfo(message):
 def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
     start_time = time.time()
-    if isinstance(message, str):
-        summonerName = message.split("game:", 1)[1]
+
+
+
+    if message.content == "game:":
+        try:
+            print("[INFO] No Summonername was given by {}, ID: {}, asking DB".format(message.author, message.author.id))
+            summonerName = read(message.author.id)
+            if(summonerName):
+                print("[INFO] Found summoner {} in the DB!".format(summonerName))
+            else:
+                print("[INFO] There was no result, returning returnText")
+                returnText = "Found no Summoner for the discord User `{}`. Have you used `game: (Summonername)` before?".format(message.author)
+                return returnText
+        except:
+            print("[ERROR] Something went wrong while searching for the SummonerName")
+            returnText = "Something broke.., try `game: (Summonername)`".format(
+                message.author)
+            return returnText
     else:
-        summonerName = message.content.split("game:", 1)[1]
+        if isinstance(message, str):
+            summonerName = message.split("game:", 1)[1].strip()
+        else:
+            summonerName = message.content.split("game:", 1)[1].strip()
+        try:
+            if exists(message.author.id): #If the ID exists in the DB..
+                if read(message.author.id) == summonerName:
+                    print("[INFO] DiscordID exists and is set to the correct Summoner, passing..")
+                else:
+                    print("[INFO] DiscordID exists, but set incorrectly, updating!")
+                    updating(message.author.id, summonerName)
+            else:
+                print("[INFO] DiscordID doesnt exist yet")
+                input(message.author.id, summonerName)
+        except:
+            print("[ERROR] Something went wrong when checking the DiscordID with the DB. Continung...")
 
     requestSummoner = classModule.summoner(summonerName)
     summonerInfo = getSummonerApiInfo(requestSummoner.name)
     if not summonerInfo:
-        returnText = "Summoner does not exist!"
+        returnText = "Summoner {} does not exist!".format(summonerName)
         return returnText
 
     try:
@@ -396,7 +428,7 @@ def getChampionByID(championInfo, championID):
         if str(championID) == championInfo["data"][championNames]["key"]:
             return championNames
     print("[ERROR] Unknown Champion ID: {}".format(championID))
-    return "No Champion with ID: {}".format(championID)
+    return championID
 
 
 def getWinrate(queueTypeInfo, queueType):
