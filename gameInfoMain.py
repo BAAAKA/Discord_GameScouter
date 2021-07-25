@@ -14,9 +14,9 @@ def getSummonerInfo(message):
     print("========================NEW SUMMONER INFO REQUEST========================")
     start_time = time.time()
     if isinstance(message, str):
-        summonerName = message.split("su: ", 1)[1]
+        summonerName = message.split("su:", 1)[1]
     else:
-        summonerName = message.content.split("su: ", 1)[1]
+        summonerName = message.content.split("su:", 1)[1]
     summonerInfo = getSummonerApiInfo(summonerName)
 
     if summonerInfo:
@@ -113,8 +113,8 @@ def getMatchInfo(message):
                 print("[INFO] There was no result, returning returnText")
                 returnText = "Found no Summoner for the discord User `{}`. Have you used `game: (Summonername)` before?".format(message.author)
                 return returnText
-        except:
-            print("[ERROR] Something went wrong while searching for the SummonerName")
+        except Exception as e:
+            print("[ERROR] Something went wrong while searching for the SummonerName: {}".format(e))
             returnText = "Something broke.., try `game: (Summonername)`".format(
                 message.author)
             return returnText
@@ -133,8 +133,8 @@ def getMatchInfo(message):
             else:
                 print("[INFO] DiscordID doesnt exist yet")
                 input(message.author.id, summonerName)
-        except:
-            print("[ERROR] Something went wrong when checking the DiscordID with the DB. Continung...")
+        except Exception as e:
+            print("[ERROR] Something went wrong when checking the DiscordID with the DB: {}".format(e))
 
     requestSummoner = classModule.summoner(summonerName)
     summonerInfo = getSummonerApiInfo(requestSummoner.name)
@@ -358,7 +358,7 @@ def getSplashURL(champion):
 
 
 def getFooterText(type):
-    text = 'gameScouter V4.0 - C 60'
+    text = 'gameScouter V5.0 - C 65'
     url = 'https://www.spriters-resource.com/resources/sheet_icons/99/101895.png'
     if type == "text":
         return text
@@ -443,7 +443,7 @@ def getRankAndLP(queueTypeInfo, queueType):
     tier = getSummonerRankInfoDetails(queueTypeInfo, queueType, "tier")
     rank = getSummonerRankInfoDetails(queueTypeInfo, queueType, "rank")
     lp = str(getSummonerRankInfoDetails(queueTypeInfo, queueType, "leaguePoints"))
-    returnText = tier + " " + rank + " - " + lp + " LP"
+    returnText = tier + " " + rank + " " + lp + " LP"
     return returnText
 
 
