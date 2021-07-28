@@ -124,16 +124,24 @@ def getLocalPerkImage(perkId):
 
 
 def getNameById(id):
-    return summonerSpells[id]
+    try:
+        return summonerSpells[id]
+    except Exception as e:
+        print("[ERROR] Unknown summonerSpell ID: {}".format(e))
+        return summonerSpells[1]
 
 
 def getMapById(id):
-    if (id == 11):
-        return "Summoners Rift"
-    elif (id == 12):
-        return "Howling Abyss"
-    else:
-        return "idk this map, what is it, take this id: " + str(id)
+    try:
+        if (id == 11):
+            return "Summoners Rift"
+        elif (id == 12):
+            return "Howling Abyss"
+        else:
+            return "idk this map, what is it, take this id: " + str(id)
+    except Exception as e:
+        print("[ERROR] Unknown map: {}".format(e))
+        return "Default"
 
 
 def getSplashURL(champion):

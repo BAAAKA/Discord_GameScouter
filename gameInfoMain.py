@@ -6,8 +6,8 @@ from createMatchupImage import getMatchImage
 from matchData import getNameById, getLocalSplash_700
 import time
 import classModule
-from DBConnector import input, read, exists, updating
-import pymysql
+from DBConnector import input, read, exists, updating, reconnect
+
 
 
 def getSummonerInfo(message):
@@ -101,10 +101,10 @@ def getMatchInfo(message):
     print("========================NEW MATCH INFO REQUEST========================")
     start_time = time.time()
 
-
+    reconnectDB()
 
     if message.content == "game:":
-        try:
+        try: #Get Summoner from DB
             print("[INFO] No Summonername was given by {}, ID: {}, asking DB".format(message.author, message.author.id))
             summonerName = read(message.author.id)
             if(summonerName):
@@ -118,23 +118,8 @@ def getMatchInfo(message):
             returnText = "Something broke.., try `game: (Summonername)`".format(
                 message.author)
             return returnText
-    else:
-        if isinstance(message, str):
-            summonerName = message.split("game:", 1)[1].strip()
-        else:
-            summonerName = message.content.split("game:", 1)[1].strip()
-        try:
-            if exists(message.author.id): #If the ID exists in the DB..
-                if read(message.author.id) == summonerName:
-                    print("[INFO] DiscordID exists and is set to the correct Summoner, passing..")
-                else:
-                    print("[INFO] DiscordID exists, but set incorrectly, updating!")
-                    updating(message.author.id, summonerName)
-            else:
-                print("[INFO] DiscordID doesnt exist yet")
-                input(message.author.id, summonerName)
-        except Exception as e:
-            print("[ERROR] Something went wrong when checking the DiscordID with the DB: {}".format(e))
+    else: #Get Summonername from Message
+        summonerName = getSummonerFromMessage(message)
 
     requestSummoner = classModule.summoner(summonerName)
     summonerInfo = getSummonerApiInfo(requestSummoner.name)
@@ -166,7 +151,7 @@ def getMatchInfo(message):
         summonerIDArray.append(summoner["summonerId"])
     summonerRanks = getSummonerRankApiInfoArray(summonerIDArray)
 
-    time.sleep(1)
+    time.sleep(0.5)
 
     # Async all summonerInfo requests
     summonerNameArray = []
@@ -351,6 +336,27 @@ def readTextfile(filename):
     print("[INFO] Succesfully read the textfile {}".format(filename))
     return content
 
+def getSummonerFromMessage(message):
+    if isinstance(message, str):  # Message exists
+        summonerName = message.split("game:", 1)[1].strip()
+    else:
+        summonerName = message.content.split("game:", 1)[1].strip()
+    inputSNameIntoDB(message, summonerName)
+    return summonerName
+
+def inputSNameIntoDB(message, summonerName):
+    try:
+        if exists(message.author.id):  # If the ID exists in the DB..
+            if read(message.author.id) == summonerName:
+                print("[INFO] DiscordID exists and is set to the correct Summoner, passing..")
+            else:
+                print("[INFO] DiscordID exists, but set incorrectly, updating!")
+                updating(message.author.id, summonerName)
+        else:
+            print("[INFO] DiscordID doesnt exist yet")
+            input(message.author.id, summonerName)
+    except Exception as e:
+        print("[ERROR] Something went wrong when checking the DiscordID with the DB: {}".format(e))
 
 def getSplashURL(champion):
     url = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{}_0.jpg".format(champion)
@@ -397,6 +403,11 @@ def getLane(spell1, spell2, lanes, mainLane):
         return mainLane
     return lanes[0]
 
+def reconnectDB():
+    try:
+        reconnect()
+    except Exception as e:
+        print("[ERROR] Reconnecting to DB failed: {}".format(e))
 
 def getMasteryChampion(MasteryInfoDetails1, MasteryInfoDetails2, MasteryInfoDetails3):
     mostPlayedChamp1 = getChampionByID(getChampionInformation(), MasteryInfoDetails1["championId"])
