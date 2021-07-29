@@ -381,7 +381,7 @@ def setTags(player):
 
     if(player.mastery1 and player.mastery2):
         if(player.mastery1["championPoints"] > player.mastery2["championPoints"]*2):
-            returnText += " (:one: `1Trick`)"
+            returnText += " (:horse: `1Trick`)"
     if(player.getMostPlayedChamp(1)[1] < 13):
         returnText += " (:black_joker: `Diverse Player`)"
     if(hasattr(player, "leaguePoints") and player.leaguePoints < 5):
@@ -412,13 +412,11 @@ def champToTag(champArray):
         elif champ == "Teemo":
             return " (:imp: `Evil`)"
         elif champ == "Soraka":
-            return " (:ambulance: `Heal bot`)"
+            return " (:ambulance: `Ambulance`)"
         elif champ == "Yone" or champ == "Yasuo" or champ == "Akali":
             return " (:flag_jp: `Edgy weeb`)"
         elif champ == "Draven":
-            return " (:sunglasses: `All about me`)"
-        elif champ == "Lee Sin":
-            return " (:flag_jp: `Playmaker`)"
+            return " (:sunglasses: `Arena favorite`)"
         elif champ == "Lee Sin":
             return " (:flag_jp: `Playmaker`)"
         elif champ == "Veigar":
@@ -441,40 +439,54 @@ def champToTag(champArray):
             return " (:four: `Four`)"
         elif champ == "Lux":
             return " (:rainbow: `Double Rainbow`)"
-        elif champ == "Nautilus" or champ == "Pyke" or champ == "Nami":
+        elif champ == "Nautilus" or champ == "Pyke":
             return " (:whale: `Ruler of the sea`)"
         elif champ == "Leona":
             return " (:sunny: `Praise the sun`)"
         elif champ == "Sett":
-            return " (:boom: `Mathematically Correct`)"
+            return " (:boom: `DIO`)"
+        elif champ == "Nami":
+            return " (:sushi: `Sushi`)"
+        elif champ == "Zac":
+            return " (:microbe: `Slimy`)"
+        elif champ == "Nunu":
+            return " (:snowflake: `Snowball`)"
+        elif champ == "Cassiopeia":
+            return " (:snake: `Scaly`)"
+        elif champ == "Azir":
+            return " (:desert: `Ruler of Shurima`)"
     return ""
 
 
 
 def winrateToTag(winrate):
-    if (winrate == 50):
-        return " (:heavy_minus_sign: `Hardstuck?`)"
-    elif (winrate < 40):
+    if (winrate < 40):
         return " (:cloud_tornado: `Trolling?`)"
-    elif (winrate < 50):
+    elif (winrate < 48):
         return " (:chart_with_downwards_trend: `Losing a lot`)"
     elif (winrate > 60):
         return " (:signal_strength: `Smurfing`)"
-    elif (winrate > 50):
+    elif (winrate > 52):
         return " (:chart_with_upwards_trend: `Climber`)"
+    else:
+        return " (:moyai: `Hardstuck`)"
 
 
 def levelToTag(level):
     if(level >= 0 and level < 50):
         return " (:baby: `Newbie`)"
-    elif(level >= 50 and level < 150):
-        return " (:fire: `Experienced`)"
-    elif (level >= 150 and level < 250):
+    elif(level >= 50 and level < 200):
+        return " (:owl: `Experienced`)"
+    elif (level >= 200 and level < 300):
         return " (:desktop: `addict`)"
-    elif(level >= 250 and level < 500):
+    elif (level >= 300 and level < 400):
+        return " (:keyboard: `No life`)"
+    elif(level >= 400 and level < 500):
         return " (:pill: `Dangerous addict`)"
     elif(level >= 500):
-        return " (:medical_symbol: `He needs help`)"
+        return " (:medical_symbol: `Get some help`)"
+    elif(level >= 700):
+        return " (:question: `???`)"
 
 def tierToTag(tier):
     skillGrouping = {
