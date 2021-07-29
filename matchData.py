@@ -27,6 +27,15 @@ summonerSpells[14] = "Ignite"
 summonerSpells[21] = "Barrier"
 summonerSpells[32] = "Mark"
 
+queue = {}
+queue[0] = "Unknown"
+queue[400] = "Normal (Draft Pick)"
+queue[440] = "Ranked Flex"
+queue[450] = "Aram"
+queue[1400] = "Ultimate Spellbook"
+queue[420] = "Ranked Solo/Duo"
+
+
 perks = {}
 perks[8005] = "Precision", "PressTheAttack"
 perks[8008] = "Precision", "LethalTempoTemp"
@@ -130,6 +139,12 @@ def getNameById(id):
         print("[ERROR] Unknown summonerSpell ID: {}".format(e))
         return summonerSpells[1]
 
+def getQueueById(id):
+    try:
+        return queue[id]
+    except Exception as e:
+        print("[ERROR] Unknown queue ID: {}".format(e))
+        return queue[0]
 
 def getMapById(id):
     try:

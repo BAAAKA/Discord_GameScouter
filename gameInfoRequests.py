@@ -97,6 +97,8 @@ def getMatchListApiInfo(accountId):
     print("[INFO API] REQUESTURL MatchList: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     #print("[INFO API] MatchList: {}".format(requestData))
+    if "status" in requestData:  # If status key exists in the requestData its probably a status 404, does not exist
+        return None
     return requestData
 
 def getMatchApiInfo(summonerID):
@@ -116,8 +118,11 @@ def getSummonerMasteryInfo(summonerID):
     print("[INFO API] getSummonerMastery RequestToAPI!")
     requestUrl = servers["EUW"] + "/lol/champion-mastery/v4/champion-masteries/by-summoner/"
     completedRequestUrl = "{}{}?api_key={}".format(requestUrl, summonerID, riotApiKey)
+    print("[INFO API] REQUESTURL MASTERY: " + completedRequestUrl)
     requestData = requests.get(completedRequestUrl).json()
     #print("[INFO API] SUMMONERMASTERY: {}".format(requestData))
+    if requestData == []:
+        return None
     return requestData
 
 def getChampionInformation(): #Get Update here https://developer.riotgames.com/docs/lol

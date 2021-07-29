@@ -44,7 +44,7 @@ def getMatchImage(match):
         if not "Unranked" == player.rankTier:
             wins = player.wins
             losses = player.losses
-            winRate = player.getWinrate()
+            winRate = player.winrate
             rankedStats = "{}% {}W/{}L".format(winRate, wins, losses)
             d.text((x+5, y + 510), rankedStats, font=getFontSized(28), fill=(255, 255, 255))
 

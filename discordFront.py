@@ -21,6 +21,8 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+    if not os.name == 'nt' and message.channel.id == 649304929613250560: #If you arent on windows/are on linux and its this channel (#Test on BotTestingGround), ignore it
+        return
     if message.content.lower().startswith("su:"):
         returnText = getSummonerInfo(message)
         if isinstance(returnText, str):
