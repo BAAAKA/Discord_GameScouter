@@ -367,60 +367,142 @@ def setLaneByChamp(match):
 def setTags(player):
     returnText = ""
     try:
-        skillGrouping={
-            "Unranked":"(:zzz: `Casual`)",
-            "IRON":"(:cyclone: `Average`)",
-            "BRONZE":"(:cyclone: `Average`)",
-            "SILVER":"(:cyclone: `Average`)",
-            "GOLD":"(:cyclone: `Average`)",
-            "PLATINUM": "(:trophy: `Skilled`)",
-            "DIAMOND": "(:trophy: `Skilled`)",
-            "MASTER": "(:trident: `Elite`)",
-            "GRANDMASTER": "(:trident: `Elite`)",
-            "CHALLENGER": "(:trident: `Elite/Pro`)",
-        }
-        print(player.tier)
-        skillGroup = skillGrouping[player.tier]
-        print(skillGroup)
+        skillGroup = tierToTag(player.tier)
         if (player.tier == "DIAMOND" and (player.rank == "I" or player.rank == "II" )):
             skillGroup = "(:trident: `Elite`)"
         returnText += skillGroup
     except Exception as e:
         print("[ERROR] in skillgrouping {}".format(e))
 
-    if(player.mainChamp == "Trundle" or player.mainChamp2 == "Trundle" or player.mainChamp3 == "Trundle"):
-        returnText += " | (:mountain_snow: `A Troll`)"
-
-    level = player.summonerLevel
-    if(level >= 0 and level < 50):
-        returnText += " | (:baby: `Newbie`)"
-    elif(level >= 50 and level < 150):
-        returnText += " | (:fire: `Active player`)"
-    elif (level >= 150 and level < 250):
-        returnText += " | (:desktop: `addict`)"
-    elif(level >= 250 and level < 500):
-        returnText += " | (:pill: `Dangerous addict`)"
-    elif(level >= 500):
-        returnText += " | (:medical_symbol: `He needs help`)"
-
     if(player.winrate):
-        winrate = int(player.winrate)
-        if (winrate == 50):
-            returnText += " | (:heavy_minus_sign: `Hardstuck?`)"
-        elif (winrate < 40):
-            returnText += " | (:cloud_tornado: `Trolling?`)"
-        elif (winrate < 50):
-            returnText += " | (:chart_with_downwards_trend: `Losing a lot`)"
-        elif (winrate > 60):
-            returnText += " | (:signal_strength: `Smurfing`)"
-        elif (winrate > 50):
-            returnText += " | (:chart_with_upwards_trend: `Climber`)"
+        returnText += winrateToTag(int(player.winrate))
+
+    returnText += levelToTag(player.summonerLevel)
 
     if(player.mastery1 and player.mastery2):
         if(player.mastery1["championPoints"] > player.mastery2["championPoints"]*2):
-            returnText += " | (:one: `1Trick`)"
-
+            returnText += " (:one: `1Trick`)"
+    if(player.getMostPlayedChamp(1)[1] < 13):
+        returnText += " (:black_joker: `Diverse Player`)"
+    if(hasattr(player, "leaguePoints") and player.leaguePoints < 5):
+        returnText += " (:sweat_drops: `About to drop`)"
+    if(hasattr(player, "hotStreak") and player.hotStreak):
+        returnText += "(:fire: `hotStreak`)"
+    if(hasattr(player, "inactive") and player.inactive):
+        returnText += "(:zzz: `inactive`)"
+    returnText += champToTag([player.mainChamp, player.mainChamp2, player.mainChamp3])
+    try:
+        returnText += laneToRole(player.getMostPlayedLane())
+        epoch_time = int(time.time())
+        match_time = int(player.matchList["matches"][99]["timestamp"]/1000)
+        hundredGamesAgo = epoch_time-match_time
+        if(2160000 > hundredGamesAgo): #If (time in sec 99 games ago) is smaller than 25 days
+            returnText += " (:fire: `Active player`)"
+    except:
+        pass
     return returnText
+
+def champToTag(champArray):
+    for i in range(2):
+        champ = champArray[i]
+        if champ == None:
+            return ""
+        elif champ == "Trundle":
+            return " (:mountain_snow: `Troll King`)"
+        elif champ == "Teemo":
+            return " (:imp: `Evil`)"
+        elif champ == "Soraka":
+            return " (:ambulance: `Heal bot`)"
+        elif champ == "Yone" or champ == "Yasuo" or champ == "Akali":
+            return " (:flag_jp: `Edgy weeb`)"
+        elif champ == "Draven":
+            return " (:sunglasses: `All about me`)"
+        elif champ == "Lee Sin":
+            return " (:flag_jp: `Playmaker`)"
+        elif champ == "Lee Sin":
+            return " (:flag_jp: `Playmaker`)"
+        elif champ == "Veigar":
+            return " (:smiling_imp: `Truly Evil`)"
+        elif champ == "Aurelion Sol":
+            return " (:comet: `good player`)"
+        elif champ == "Vel'Koz":
+            return " (:triangular_ruler: `Has a math degree`)"
+        elif champ == "Vayne":
+            return " (:bow_and_arrow: `Gosu`)"
+        elif champ == "Heimerdinger":
+            return " (:tokyo_tower: `Tower defense`)"
+        elif champ == "Ziggs":
+            return " (:bomb: `Bomberman`)"
+        elif champ == "Ivern" or champ == "Zyra":
+            return " (:olive: `Gardener`)"
+        elif champ == "Ziggs":
+            return " (:bomb: `Bomberman`)"
+        elif champ == "Jhin":
+            return " (:four: `Four`)"
+        elif champ == "Lux":
+            return " (:rainbow: `Double Rainbow`)"
+        elif champ == "Nautilus" or champ == "Pyke" or champ == "Nami":
+            return " (:whale: `Ruler of the sea`)"
+        elif champ == "Leona":
+            return " (:sunny: `Praise the sun`)"
+        elif champ == "Sett":
+            return " (:boom: `Mathematically Correct`)"
+    return ""
+
+
+
+def winrateToTag(winrate):
+    if (winrate == 50):
+        return " (:heavy_minus_sign: `Hardstuck?`)"
+    elif (winrate < 40):
+        return " (:cloud_tornado: `Trolling?`)"
+    elif (winrate < 50):
+        return " (:chart_with_downwards_trend: `Losing a lot`)"
+    elif (winrate > 60):
+        return " (:signal_strength: `Smurfing`)"
+    elif (winrate > 50):
+        return " (:chart_with_upwards_trend: `Climber`)"
+
+
+def levelToTag(level):
+    if(level >= 0 and level < 50):
+        return " (:baby: `Newbie`)"
+    elif(level >= 50 and level < 150):
+        return " (:fire: `Experienced`)"
+    elif (level >= 150 and level < 250):
+        return " (:desktop: `addict`)"
+    elif(level >= 250 and level < 500):
+        return " (:pill: `Dangerous addict`)"
+    elif(level >= 500):
+        return " (:medical_symbol: `He needs help`)"
+
+def tierToTag(tier):
+    skillGrouping = {
+        "Unranked": "(:zzz: `Casual`)",
+        "IRON": "(:cyclone: `Average`)",
+        "BRONZE": "(:cyclone: `Average`)",
+        "SILVER": "(:rosette: `Experienced`)",
+        "GOLD": "(:rosette: `Experienced`)",
+        "PLATINUM": "(:trophy: `Skilled`)",
+        "DIAMOND": "(:trophy: `Skilled`)",
+        "MASTER": "(:trident: `Elite`)",
+        "GRANDMASTER": "(:trident: `Elite`)",
+        "CHALLENGER": "(:trident: `Elite/Pro`)",
+    }
+    return skillGrouping[tier]
+
+def laneToRole(lane):
+    try:
+        laneToRole={
+            "TOP":"(:crossed_swords: `Toplaner`)",
+            "JUNGLE":"(:palm_tree: `Jungler`)",
+            "MID":"(:man_mage: `Midlaner`)",
+            "DUO_CARRY":"(:bow_and_arrow: `ADC`)",
+            "DUO_SUPPORT":"(:shield: `Support`)",
+        }
+        return laneToRole[lane]
+    except:
+        return ""
 
 def readTextfile(filename):
     text_file = open(filename, "r")
