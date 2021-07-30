@@ -67,7 +67,7 @@ def getMatchImage(match):
         imageArena.paste(imageEdited, getAreaOfCustom(x+128, y + 400, 64), mask=imageEdited)
 
         # Most Played Lane
-        mostPlayedLane = player.getMostPalyedLane()
+        mostPlayedLane = player.getMostPlayedLane()
         if mostPlayedLane == "DUO_CARRY":
             mostPlayedLane = "ADC"
         elif mostPlayedLane == "DUO_SUPPORT":

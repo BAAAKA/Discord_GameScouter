@@ -230,7 +230,7 @@ def getMatchInfo(message):
     print("[INFO] ====Beginning Rank/MatchList/SummonerInfo defining====")
     for player in match.players:
         player.matchList = matchListInfos[player.nr].json()
-        player.mainChamp = getChampionByID(championInfo, player.getMostPlayedLane(1))
+        player.mainChamp = getChampionByID(championInfo, player.getMostPlayedChamp(1))
         for rank in summonerRanks:
             ranked = rank.json()
             if len(ranked) > 0:
@@ -403,8 +403,9 @@ def setTags(player):
     return returnText
 
 def champToTag(champArray):
-    for i in range(2):
+    for i in range(3):
         champ = champArray[i]
+        print("[INFO] See if there is tag for champ {}".format(champ))
         if champ == None:
             return ""
         elif champ == "Trundle":
@@ -414,29 +415,27 @@ def champToTag(champArray):
         elif champ == "Soraka":
             return " (:ambulance: `Ambulance`)"
         elif champ == "Yone" or champ == "Yasuo" or champ == "Akali":
-            return " (:flag_jp: `Edgy weeb`)"
+            return " (:ninja: `Edgy weeb`)"
         elif champ == "Draven":
             return " (:sunglasses: `Arena favorite`)"
         elif champ == "Lee Sin":
             return " (:flag_jp: `Playmaker`)"
         elif champ == "Veigar":
-            return " (:smiling_imp: `Truly Evil`)"
+            return " (:smiling_imp: `Chaotic Evil`)"
         elif champ == "Aurelion Sol":
             return " (:comet: `good player`)"
         elif champ == "Vel'Koz":
             return " (:triangular_ruler: `Has a math degree`)"
-        elif champ == "Vayne":
-            return " (:bow_and_arrow: `Gosu`)"
         elif champ == "Heimerdinger":
             return " (:tokyo_tower: `Tower defense`)"
         elif champ == "Ziggs":
             return " (:bomb: `Bomberman`)"
-        elif champ == "Ivern" or champ == "Zyra":
+        elif champ == "Ivern":
             return " (:olive: `Gardener`)"
+        elif champ == "Zyra":
+            return " (:white_flower: `Feisty Flower`)"
         elif champ == "Ziggs":
             return " (:bomb: `Bomberman`)"
-        elif champ == "Jhin":
-            return " (:four: `Four`)"
         elif champ == "Lux":
             return " (:rainbow: `Double Rainbow`)"
         elif champ == "Nautilus" or champ == "Pyke":
@@ -444,7 +443,7 @@ def champToTag(champArray):
         elif champ == "Leona":
             return " (:sunny: `Praise the sun`)"
         elif champ == "Sett":
-            return " (:boom: `DIO`)"
+            return " (:clock3: `DIO`)"
         elif champ == "Nami":
             return " (:sushi: `Sushi`)"
         elif champ == "Zac":
@@ -455,6 +454,18 @@ def champToTag(champArray):
             return " (:snake: `Scaly`)"
         elif champ == "Azir":
             return " (:desert: `Ruler of Shurima`)"
+        elif champ == "Yi" or champ == "Tryndamere" or champ == "Katarina" or champ == "Vayne" or champ == "Riven":
+            return " (:exclamation: `1 vs 5`)"
+        elif champ == "Sejuani" or champ == "Sejuani":
+            return " (:family_mwgb: `Team Player`)"
+        elif champ == "Yuumi":
+            return " (:cat: `Cat IRL`)"
+        elif champ == "Jhin" or champ == "Varus":
+            return " (:cupid: `Sniper`)"
+        elif champ == "Kindred":
+            return " (:wolf: `Spirit of Death`)"
+        elif champ == "Gragas":
+            return " (:beers: `Drunkard`)"
     return ""
 
 
@@ -462,11 +473,11 @@ def champToTag(champArray):
 def winrateToTag(winrate):
     if (winrate < 40):
         return " (:cloud_tornado: `Trolling?`)"
-    elif (winrate < 48):
+    elif (winrate < 47):
         return " (:chart_with_downwards_trend: `Losing a lot`)"
     elif (winrate > 60):
         return " (:signal_strength: `Smurfing`)"
-    elif (winrate > 52):
+    elif (winrate > 51):
         return " (:chart_with_upwards_trend: `Climber`)"
     else:
         return " (:moyai: `Hardstuck`)"
@@ -493,8 +504,8 @@ def tierToTag(tier):
         "Unranked": "(:zzz: `Casual`)",
         "IRON": "(:cyclone: `Average`)",
         "BRONZE": "(:cyclone: `Average`)",
-        "SILVER": "(:rosette: `Experienced`)",
-        "GOLD": "(:rosette: `Experienced`)",
+        "SILVER": "(:rosette: `Capable`)",
+        "GOLD": "(:rosette: `Capable`)",
         "PLATINUM": "(:trophy: `Skilled`)",
         "DIAMOND": "(:trophy: `Skilled`)",
         "MASTER": "(:trident: `Elite`)",
